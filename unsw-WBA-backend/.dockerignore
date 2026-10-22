@@ -1,0 +1,24 @@
+# IDE
+.idea/
+*.iml
+.vscode/
+
+.DS_Store
+
+target/
+*/target/
+.flattened-pom.xml
+
+# Git
+.git/
+.gitignore
+
+
+README.md
+
+# Uploaded files generated during local testing
+file/
+
+# Log
+logBack/
+logs/

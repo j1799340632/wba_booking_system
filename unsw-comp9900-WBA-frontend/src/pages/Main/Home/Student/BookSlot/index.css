@@ -1,0 +1,741 @@
+.book-slot-main {
+    flex: 1;
+    min-width: 0;
+    padding: 40px 90px;
+}
+
+.book-slot-container {
+    max-width: 1240px;
+    margin: 0 auto;
+}
+
+.book-slot-title {
+    margin: 0;
+    font-size: 34px;
+    color: #111827;
+    font-weight: 800;
+    text-align: left;
+}
+
+.book-slot-subtitle {
+    margin: 8px 0 28px;
+    color: #64748b;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: left;
+}
+
+/* ================= Filter Toolbar ================= */
+
+.book-slot-filters {
+    margin: 28px 0 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.book-slot-select {
+    width: 190px;
+    min-width: 160px;
+    height: 32px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: white;
+    color: #111827;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 0 30px 0 10px;
+    cursor: pointer;
+    outline: none;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.book-slot-select:hover {
+    border-color: #94a3b8;
+}
+
+.book-slot-select:focus {
+    border-color: #0b4f71;
+    box-shadow: 0 0 0 3px rgba(11, 79, 113, 0.12);
+}
+
+.book-slot-filter-button,
+.book-slot-reset-button {
+    height: 32px;
+    border-radius: 6px;
+    padding: 0 16px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        opacity 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.book-slot-filter-button {
+    background: #0b4f71;
+    color: white;
+    border: 1px solid #0b4f71;
+}
+
+.book-slot-filter-button:hover:not(:disabled) {
+    background: #083e59;
+    border-color: #083e59;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(11, 79, 113, 0.18);
+}
+
+.book-slot-reset-button {
+    background: white;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+
+.book-slot-reset-button:hover:not(:disabled) {
+    background: #f8fafc;
+    border-color: #94a3b8;
+    transform: translateY(-1px);
+}
+
+.book-slot-filter-button:disabled,
+.book-slot-reset-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.book-slot-count {
+    margin-left: auto;
+    color: #64748b;
+    font-size: 18px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* ================= Slot List ================= */
+
+.book-slot-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.book-slot-refreshing {
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: #e5f2f8;
+    color: #0b4f71;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.book-slot-empty {
+    min-height: 220px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    background: white;
+    color: #64748b;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+    padding: 30px;
+}
+
+.book-slot-empty h3 {
+    margin: 4px 0 0;
+    color: #111827;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.book-slot-empty p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.book-slot-card {
+    background: white;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    min-height: 72px;
+    padding: 20px 26px;
+    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.12);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.book-slot-card:hover {
+    transform: translateY(-2px);
+    border-color: #94a3b8;
+    box-shadow: 0 7px 18px rgba(15, 23, 42, 0.1);
+}
+
+.book-slot-card-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.book-slot-top-line {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.book-slot-avatar-button {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: #d8eef9;
+    color: #0b4f71;
+    font-weight: 800;
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.book-slot-avatar-button:hover {
+    transform: scale(1.04);
+    box-shadow: 0 3px 10px rgba(11, 79, 113, 0.18);
+}
+
+.book-slot-avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.book-slot-name {
+    margin: 0;
+    color: #111827;
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.book-slot-name:hover {
+    color: #0b4f71;
+}
+
+.book-slot-role {
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.book-slot-blue-badge {
+    background: #d8eef9;
+    color: #0b4f71;
+    padding: 3px 9px;
+    border-radius: 5px;
+    font-weight: 800;
+    font-size: 10px;
+}
+
+.book-slot-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.book-slot-info {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.book-slot-meta {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.book-slot-book-button {
+    flex-shrink: 0;
+    background: #0b4f71;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 13px 22px;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.book-slot-book-button:hover {
+    background: #083e59;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 12px rgba(11, 79, 113, 0.2);
+}
+
+.book-slot-book-button:active {
+    transform: translateY(0);
+}
+
+/* ================= Pagination ================= */
+
+.book-slot-pagination {
+    margin-top: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+}
+
+.book-slot-page-button {
+    width: 110px;
+    height: 42px;
+    background: #0b4f71;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease,
+        opacity 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.book-slot-page-button:hover:not(:disabled) {
+    background: #083e59;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 12px rgba(11, 79, 113, 0.18);
+}
+
+.book-slot-page-button.is-disabled,
+.book-slot-page-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.book-slot-page-text {
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* ================= Booking Modal ================= */
+
+.book-slot-modal-header {
+    padding: 24px 28px 18px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.book-slot-modal-title {
+    margin: 0;
+    color: #111827;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.book-slot-modal-subtitle {
+    margin: 6px 0 0;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.book-slot-modal-body {
+    padding: 26px 34px;
+}
+
+.book-slot-modal-info-box {
+    background: #e5f2f8;
+    border-radius: 12px;
+    padding: 18px 20px;
+    color: #475569;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.book-slot-modal-line {
+    margin: 4px 0;
+}
+
+.book-slot-modal-actions {
+    padding: 18px 22px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.book-slot-cancel-button {
+    background: #e4eaf1;
+    color: #111827;
+    border: none;
+    border-radius: 7px;
+    padding: 10px 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.book-slot-cancel-button:hover:not(:disabled) {
+    background: #d6dee8;
+}
+
+.book-slot-confirm-button {
+    background: #0b4f71;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    padding: 10px 20px;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.book-slot-confirm-button:hover:not(:disabled) {
+    background: #083e59;
+}
+
+.book-slot-confirm-button.is-disabled,
+.book-slot-confirm-button:disabled,
+.book-slot-cancel-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ================= Message Modal ================= */
+
+.book-slot-message-modal {
+    text-align: center;
+}
+
+.book-slot-success-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: #d9eef8;
+    color: #0b4f71;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    font-weight: 800;
+    margin: 0 auto 18px;
+}
+
+.book-slot-error-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: #b91c1c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    font-weight: 800;
+    margin: 0 auto 18px;
+}
+
+.book-slot-message-title {
+    margin: 0;
+    color: #111827;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.book-slot-message-text {
+    margin: 10px 0;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.book-slot-message-note {
+    margin: 12px 0 24px;
+    color: #0b4f71;
+    background: #e5f2f8;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.book-slot-message-button {
+    background: #0b4f71;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 28px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.book-slot-message-button:hover {
+    background: #083e59;
+    transform: translateY(-1px);
+}
+
+.book-slot-error-button {
+    background: #b91c1c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 28px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.book-slot-error-button:hover {
+    background: #991b1b;
+    transform: translateY(-1px);
+}
+
+/* ================= Tablet ================= */
+
+@media (max-width: 1024px) {
+    .book-slot-main {
+        padding: 80px 36px 40px;
+    }
+
+    .book-slot-filters {
+        align-items: stretch;
+    }
+
+    .book-slot-select {
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .book-slot-count {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
+/* ================= Mobile ================= */
+
+@media (max-width: 768px) {
+    .book-slot-main {
+        padding: 80px 16px 24px;
+    }
+
+    .book-slot-title {
+        font-size: 26px;
+    }
+
+    .book-slot-subtitle {
+        font-size: 15px;
+        margin-bottom: 22px;
+    }
+
+    .book-slot-filters {
+        margin: 22px 0 26px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .book-slot-select,
+    .book-slot-filter-button,
+    .book-slot-reset-button {
+        width: 100%;
+        min-width: 0;
+        height: 40px;
+    }
+
+    .book-slot-count {
+        width: 100%;
+        font-size: 14px;
+        text-align: left;
+    }
+
+    .book-slot-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 18px;
+        padding: 18px;
+    }
+
+    .book-slot-top-line {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .book-slot-row,
+    .book-slot-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .book-slot-book-button {
+        width: 100%;
+    }
+
+    .book-slot-pagination {
+        gap: 10px;
+    }
+
+    .book-slot-page-button {
+        width: 92px;
+    }
+
+    .book-slot-modal-header {
+        padding: 20px 18px 16px;
+    }
+
+    .book-slot-modal-body {
+        padding: 20px 18px;
+    }
+
+    .book-slot-modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .book-slot-cancel-button,
+    .book-slot-confirm-button,
+    .book-slot-message-button,
+    .book-slot-error-button {
+        width: 100%;
+    }
+}
+
+/* ================= Small Mobile ================= */
+
+@media (max-width: 480px) {
+    .book-slot-main {
+        padding: 76px 12px 20px;
+    }
+
+    .book-slot-title {
+        font-size: 24px;
+    }
+
+    .book-slot-card {
+        padding: 16px;
+    }
+
+    .book-slot-name {
+        font-size: 16px;
+    }
+
+    .book-slot-avatar-button {
+        width: 40px;
+        height: 40px;
+    }
+
+    .book-slot-pagination {
+        flex-wrap: wrap;
+    }
+
+    .book-slot-page-text {
+        width: 100%;
+        text-align: center;
+        order: -1;
+    }
+
+    .book-slot-page-button {
+        flex: 1;
+        max-width: 140px;
+    }
+}
+.book-slot-time-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 14px 0;
+  }
+  
+  .book-slot-time-label {
+    color: #334155;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  
+  .book-slot-time-select {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 36px 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #0f172a;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+  }
+  
+  .book-slot-time-select:hover {
+    border-color: #94a3b8;
+  }
+  
+  .book-slot-time-select:focus {
+    border-color: #0f5f7f;
+    box-shadow:
+      0 0 0 3px
+      rgba(15, 95, 127, 0.12);
+  }
+  
+  .book-slot-time-select:disabled {
+    background: #f1f5f9;
+    color: #94a3b8;
+    cursor: not-allowed;
+  }

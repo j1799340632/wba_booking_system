@@ -1,0 +1,30 @@
+--- # server
+server:
+  port: 8080
+  http2:
+    enabled: true
+  shutdown: graceful
+
+--- # spring
+spring:
+  application:
+    name: unsw-WBA-backend
+  profiles:
+    include: db,custom,calendar
+  servlet:
+    multipart:
+      max-file-size: 5MB
+  output:
+    ansi:
+      enabled: always
+  jackson:
+    time-zone: GMT+10
+    date-format: yyyy-MM-dd HH:mm:ss
+  threads:
+    virtual:
+      enabled: true
+
+--- # Log
+logging:
+  level:
+    edu.unsw: ${LOGGING_LEVEL:debug}

@@ -1,0 +1,12 @@
+--- # redisson 配置
+redisson:
+  uri: ${REDISSON_URI:redis://localhost:6379}
+  password: ${REDISSON_PASSWORD:}
+  timeout: 3000
+  connection-timeout: 10000
+  idle-connection-timeout: 10000
+  connectionMinimumIdleSize: 1
+  master-connection-minimum-idle-size: 1
+  slave-connection-minimum-idle-size: 1
+  read-mode: slave
+  subscription-mode: slave

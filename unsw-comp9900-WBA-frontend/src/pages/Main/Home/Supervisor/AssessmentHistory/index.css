@@ -1,0 +1,376 @@
+.assessment-history-page {
+    background: #f4f7fb;
+}
+
+.assessment-history-main {
+    flex: 1;
+    padding: 40px 90px;
+}
+
+.assessment-history-content {
+    width: 100%;
+    max-width: 1240px;
+    margin: 0 auto;
+}
+
+.assessment-history-header {
+    margin-bottom: 40px;
+}
+
+.assessment-history-title {
+    margin: 0;
+    font-size: 34px;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.03em;
+}
+
+.assessment-history-subtitle {
+    margin: 6px 0 0;
+    font-size: 17px;
+    color: #5b6b82;
+    font-weight: 500;
+}
+
+.assessment-history-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.assessment-history-card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 26px 40px;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.18);
+    border: 1px solid #e5e7eb;
+}
+
+.assessment-history-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 12px;
+}
+
+.assessment-history-name-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.assessment-history-student-name {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.assessment-history-date {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: #637083;
+}
+
+.assessment-history-score-wrapper {
+    display: flex;
+    align-items: baseline;
+    font-size: 26px;
+    font-weight: 500;
+    color: #111827;
+    white-space: nowrap;
+}
+
+.assessment-history-score {
+    color: #111827;
+}
+
+.assessment-history-score.excellent {
+    color: #16a34a;
+}
+
+.assessment-history-score-divider {
+    margin: 0 1px;
+}
+
+.assessment-history-feedback-box {
+    background: #ddedf4;
+    border-radius: 8px;
+    padding: 14px 16px;
+}
+
+.assessment-history-feedback {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #5e6a75;
+}
+
+.assessment-history-message-card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 24px 32px;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+}
+
+.assessment-history-message {
+    margin: 0;
+    color: #5b6b82;
+    font-size: 15px;
+}
+
+.assessment-history-error-card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 24px 32px;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+    border-left: 4px solid #dc2626;
+}
+
+.assessment-history-error-text {
+    margin: 0;
+    color: #dc2626;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.assessment-history-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.4;
+    background: #b9dceb;
+    color: #0f5e7a;
+}
+
+.assessment-history-badge.cbd {
+    background: #fde68a;
+    color: #8a5a00;
+}
+
+@media (max-width: 1024px) {
+    .assessment-history-main {
+        padding: 80px 32px 40px;
+    }
+
+    .assessment-history-content {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .assessment-history-page {
+        display: block;
+    }
+
+    .assessment-history-main {
+        padding: 80px 16px 24px;
+    }
+
+    .assessment-history-header {
+        margin-bottom: 28px;
+    }
+
+    .assessment-history-title {
+        font-size: 26px;
+    }
+
+    .assessment-history-subtitle {
+        font-size: 15px;
+    }
+
+    .assessment-history-list {
+        gap: 18px;
+    }
+
+    .assessment-history-card {
+        padding: 20px 18px;
+    }
+
+    .assessment-history-card-top {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .assessment-history-name-row {
+        flex-wrap: wrap;
+    }
+
+    .assessment-history-score-wrapper {
+        font-size: 24px;
+    }
+
+    .assessment-history-message-card,
+    .assessment-history-error-card {
+        padding: 20px 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .assessment-history-main {
+        padding: 76px 12px 20px;
+    }
+
+    .assessment-history-title {
+        font-size: 24px;
+    }
+
+    .assessment-history-subtitle {
+        font-size: 14px;
+    }
+
+    .assessment-history-card {
+        padding: 18px 16px;
+    }
+
+    .assessment-history-student-name {
+        font-size: 16px;
+    }
+
+    .assessment-history-feedback {
+        font-size: 13px;
+    }
+}
+
+/* ---------- edit button ---------- */
+.assessment-history-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    white-space: nowrap;
+}
+
+.assessment-history-edit-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    height: 36px;
+    padding: 0 13px;
+    border: 1px solid #d8e1ea;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.assessment-history-edit-button:hover {
+    color: #174f70;
+    border-color: #8cb2c8;
+    background: #f2f8fb;
+    transform: translateY(-1px);
+}
+
+.assessment-history-edit-card {
+    text-align: left;
+}
+
+.assessment-history-edit-heading {
+    margin-bottom: 20px;
+}
+
+.assessment-history-edit-form-title {
+    margin: 0;
+    color: #111827;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.assessment-history-edit-form-subtitle {
+    margin: 6px 0 0;
+    font-size: 14px;
+    color: #64748b;
+}
+
+.assessment-history-edit-student {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.assessment-history-edit-label {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+}
+
+.assessment-history-edit-input,
+.assessment-history-edit-textarea {
+    margin-top: 6px;
+    padding: 9px 10px;
+    border: none;
+    border-radius: 6px;
+    background: #e4eaf1;
+    color: #111827;
+    outline: none;
+    font-weight: 600;
+    font-family: inherit;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.assessment-history-edit-textarea {
+    min-height: 110px;
+    resize: vertical;
+    font-weight: 500;
+}
+
+.assessment-history-edit-actions {
+    margin-top: 26px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.assessment-history-cancel-button,
+.assessment-history-submit-button {
+    border: none;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.assessment-history-cancel-button {
+    background: #e4eaf1;
+    color: #111827;
+    padding: 9px 24px;
+}
+
+.assessment-history-cancel-button:hover:not(:disabled) {
+    background: #cbd5e1;
+    transform: translateY(-1px);
+}
+
+.assessment-history-submit-button {
+    background: #0b4f71;
+    color: #ffffff;
+    padding: 9px 28px;
+}
+
+.assessment-history-submit-button:hover:not(:disabled) {
+    background: #0a4360;
+    transform: translateY(-1px);
+}
+
+.assessment-history-cancel-button:disabled,
+.assessment-history-submit-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}

@@ -1,0 +1,66 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>edu.unsw</groupId>
+        <artifactId>unsw-WBA-backend</artifactId>
+        <version>${revision}</version>
+    </parent>
+    <groupId>edu.unsw.service</groupId>
+    <artifactId>unsw-WBA-service</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>edu.unsw.dao</groupId>
+            <artifactId>unsw-WBA-dao</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+        <!-- Write Excel files -->
+        <dependency>
+            <groupId>org.dhatim</groupId>
+            <artifactId>fastexcel</artifactId>
+            <version>0.20.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Parse Excel files -->
+        <dependency>
+            <groupId>org.dhatim</groupId>
+            <artifactId>fastexcel-reader</artifactId>
+            <version>0.20.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Parse and generate i-Calendar (RFC 5545) -->
+        <dependency>
+            <groupId>org.mnode.ical4j</groupId>
+            <artifactId>ical4j</artifactId>
+            <version>4.3.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Google Calendar API -->
+        <dependency>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-calendar</artifactId>
+            <version>v3-rev411-1.25.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Google OAuth 2.0 -->
+        <dependency>
+            <groupId>com.google.oauth-client</groupId>
+            <artifactId>google-oauth-client</artifactId>
+            <version>1.39.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- JSON processing required by Google API client -->
+        <dependency>
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client-gson</artifactId>
+            <version>2.1.1</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+</project>

@@ -1,0 +1,227 @@
+.notification-bell-button {
+  position: relative;
+  display: flex;
+  /*width: 32px;*/
+  /*height: 32px;*/
+  /*flex-shrink: 0;*/
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  cursor: pointer;
+  appearance: none;
+  transition: background 0.2s ease;
+}
+
+.notification-bell-button:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.notification-bell-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  display: flex;
+  min-width: 17px;
+  height: 17px;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.notification-bell-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: rgba(15, 23, 42, 0.3);
+  appearance: none;
+}
+
+.notification-bell-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: auto;
+  z-index: 9999;
+  display: flex;
+  width: min(420px, 100vw);
+  height: 100vh;
+  margin: 0;
+  flex-direction: column;
+  background: #ffffff;
+  color: #111827;
+  box-shadow: -10px 0 35px rgba(15, 23, 42, 0.18);
+  transform: translateX(100%);
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease,
+    visibility 0.3s ease;
+}
+
+.notification-bell-drawer.is-open {
+  transform: translateX(0);
+  visibility: visible;
+  opacity: 1;
+}
+
+.notification-bell-header {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 26px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.notification-bell-heading {
+  margin: 0;
+  color: #111827;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.notification-bell-summary {
+  margin: 5px 0 0;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.notification-bell-close {
+  display: flex;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: #475569;
+  cursor: pointer;
+  appearance: none;
+}
+
+.notification-bell-close:hover {
+  background: #f1f5f9;
+}
+
+.notification-bell-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: #ffffff;
+}
+
+.notification-bell-item {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px 26px;
+  border-bottom: 1px solid #eef2f6;
+  background: #ffffff;
+  color: #111827;
+}
+
+.notification-bell-item.is-unread {
+  background: #eef4fd;
+}
+
+.notification-bell-icon {
+  display: flex;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.notification-bell-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.notification-bell-content h3 {
+  margin: 0;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.notification-bell-content p {
+  margin: 6px 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.notification-bell-content span {
+  display: block;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.notification-bell-empty {
+  display: flex;
+  min-height: 260px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  color: #94a3b8;
+  text-align: center;
+}
+
+.notification-bell-empty p {
+  margin: 14px 0 4px;
+  color: #475569;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.notification-bell-empty span {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .notification-bell-header {
+    padding: 22px 20px;
+  }
+
+  .notification-bell-item {
+    padding: 18px 20px;
+  }
+
+  .notification-bell-drawer {
+    width: 100vw;
+  }
+}

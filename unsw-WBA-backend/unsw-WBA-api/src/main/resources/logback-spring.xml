@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+    <!--springboot default configuration-->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <!-- Log saved location -->
+    <property name="log.path" value="logBack"/>
+    <!-- Log output format -->
+    <property name="file.log.pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%X{traceId}] %logger{36} - [%method:%line] - %msg%n" />
+    <property name="log.pattern" value="%blue(%date{yyyy-MM-dd HH:mm:ss.SSS}) %clr(${LOG_LEVEL_PATTERN:-%5p}) %highlight([%thread]) %yellow([%X{traceId}]) %cyan(%logger{36} - [%M:%L]) - %msg%n"/>
+
+    <!-- Console output -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- springboot default color -->
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- System log output -->
+    <appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.path}/info.log</file>
+        <!-- Policy: Create log file in terms of time -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- Log filename format -->
+            <fileNamePattern>${log.path}/info.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- The longest history 30 days -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${file.log.pattern}</pattern>
+        </encoder>
+        <!-- Record all logs at INFO level and above (INFO, WARN, ERROR), and intercept DEBUG and TRACE -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+    </appender>
+
+    <appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.path}/error.log</file>
+        <!-- Policy：Create log file in terms of time -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- Log filename format -->
+            <fileNamePattern>${log.path}/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- The longest history 30 days -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${file.log.pattern}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- Filter level -->
+            <level>ERROR</level>
+            <!-- Match: record -->
+            <onMatch>ACCEPT</onMatch>
+            <!-- Not match: not record -->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- Spring log  -->
+    <logger name="org.springframework" level="warn"/>
+
+    <root level="info">
+        <appender-ref ref="file_info"/>
+        <appender-ref ref="file_error"/>
+        <appender-ref ref="console"/>
+    </root>
+</configuration>

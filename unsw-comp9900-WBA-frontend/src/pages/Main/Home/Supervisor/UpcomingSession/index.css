@@ -1,0 +1,458 @@
+.upcoming-session-main {
+    flex: 1;
+    padding: 40px 90px;
+    box-sizing: border-box;
+}
+
+.upcoming-session-container {
+    max-width: 1240px;
+    margin: 0 auto;
+}
+
+.upcoming-session-header {
+    margin-bottom: 34px;
+}
+
+.upcoming-session-title {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 700;
+    color: #1f2937;
+    text-align: left;
+}
+
+.upcoming-session-subtitle {
+    margin-top: 4px;
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 600;
+    text-align: left;
+}
+
+.upcoming-session-loading {
+    color: #64748b;
+    text-align: left;
+}
+
+.upcoming-session-section.approved {
+    margin-top: 42px;
+}
+
+.upcoming-session-section.pending {
+    margin-top: 36px;
+}
+
+.upcoming-session-section-title {
+    margin: 0 0 18px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+    text-align: left;
+}
+
+.upcoming-session-empty {
+    color: #64748b;
+    text-align: left;
+}
+
+.upcoming-session-card {
+    background: white;
+    border-radius: 10px;
+    padding: 22px 28px;
+    margin-bottom: 22px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.upcoming-session-card-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.upcoming-session-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #e5f2f8;
+    color: #0b4f71;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.upcoming-session-card-content {
+    text-align: left;
+}
+
+.upcoming-session-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.upcoming-session-student-name {
+    font-size: 16px;
+    color: #111827;
+}
+
+.upcoming-session-badge {
+    background: #e8eff5;
+    color: #003b5c;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 4px;
+    padding: 3px 7px;
+}
+
+.upcoming-session-detail-row {
+    margin-top: 10px;
+    color: #64748b;
+    font-size: 13px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.upcoming-session-icon-text {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.upcoming-session-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.upcoming-session-button {
+    border-radius: 7px;
+    padding: 8px 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+}
+
+.upcoming-session-button.approve {
+    background: #dde8ff;
+    color: #2563eb;
+}
+
+.upcoming-session-button.decline {
+    background: #e4eaf1;
+    color: #475569;
+}
+
+.upcoming-session-button.complete {
+    background: #ffffff;
+    color: deepskyblue;
+    border: 1px solid #e5e7eb;
+}
+
+.upcoming-session-button.cancel {
+    background: #ffffff;
+    color: #ef4444;
+    border: 1px solid #e5e7eb;
+}
+
+.upcoming-session-modal-title-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.upcoming-session-modal-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.upcoming-session-modal-description {
+    margin-top: 14px;
+    color: #64748b;
+    line-height: 1.6;
+    text-align: center;
+    font-size: 15px;
+}
+
+.upcoming-session-info-box {
+    margin-top: 20px;
+    padding: 20px 24px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    text-align: left;
+}
+
+.upcoming-session-info-title {
+    margin: 0 0 12px 0;
+    font-weight: 700;
+    color: #111827;
+    font-size: 16px;
+}
+
+.upcoming-session-radio-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 0;
+    cursor: pointer;
+    text-align: left;
+}
+
+.upcoming-session-radio-input {
+    margin-top: 5px;
+    width: 16px;
+    height: 16px;
+    accent-color: #f97316;
+}
+
+.upcoming-session-radio-title {
+    font-weight: 700;
+    color: #111827;
+    font-size: 16px;
+}
+
+.upcoming-session-radio-description {
+    font-size: 14px;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+.upcoming-session-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 26px;
+}
+
+.upcoming-session-secondary-button,
+.upcoming-session-success-button,
+.upcoming-session-danger-button {
+    border-radius: 7px;
+    padding: 9px 22px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.upcoming-session-secondary-button {
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #475569;
+}
+
+.upcoming-session-success-button {
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: green;
+}
+
+.upcoming-session-danger-button {
+    border: none;
+    background: #dc2626;
+    color: #ffffff;
+}
+
+.upcoming-session-complete-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.upcoming-session-complete-form label {
+    color: #111827;
+    font-weight: 600;
+}
+
+.upcoming-session-score-input {
+    width: 30%;
+    max-width: 100px;
+    margin-top: 8px;
+    padding: 13px 14px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    background: #e4eaf1;
+    box-sizing: border-box;
+    color: #374151;
+}
+
+.upcoming-session-feedback-input {
+    height: 150px;
+    resize: vertical;
+    margin-top: 8px;
+    padding: 13px 14px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    background: #e4eaf1;
+    box-sizing: border-box;
+    color: #374151;
+}
+
+.upcoming-session-info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    color: #475569;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.upcoming-session-warning-text {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+@media (max-width: 1024px) {
+    .upcoming-session-main {
+        padding: 80px 36px;
+    }
+
+    .upcoming-session-container {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .upcoming-session-main {
+        padding: 80px 16px 24px;
+    }
+
+    .upcoming-session-title {
+        font-size: 26px;
+    }
+
+    .upcoming-session-subtitle {
+        font-size: 14px;
+    }
+
+    .upcoming-session-card {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 18px;
+    }
+
+    .upcoming-session-card-left {
+        align-items: flex-start;
+    }
+
+    .upcoming-session-name-row {
+        flex-wrap: wrap;
+    }
+
+    .upcoming-session-detail-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .upcoming-session-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .upcoming-session-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .upcoming-session-modal-title {
+        font-size: 22px;
+    }
+
+    .upcoming-session-info-box {
+        padding: 18px;
+    }
+
+    .upcoming-session-modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .upcoming-session-secondary-button,
+    .upcoming-session-success-button,
+    .upcoming-session-danger-button {
+        width: 100%;
+    }
+
+    .upcoming-session-score-input {
+        width: 100%;
+        max-width: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .upcoming-session-main {
+        padding: 76px 12px 20px;
+    }
+
+    .upcoming-session-title {
+        font-size: 24px;
+    }
+
+    .upcoming-session-card {
+        padding: 16px;
+    }
+
+    .upcoming-session-avatar {
+        width: 42px;
+        height: 42px;
+    }
+
+    .upcoming-session-student-name {
+        font-size: 15px;
+    }
+
+    .upcoming-session-radio-title {
+        font-size: 15px;
+    }
+
+    .upcoming-session-radio-description,
+    .upcoming-session-modal-description,
+    .upcoming-session-info-list {
+        font-size: 13px;
+    }
+}
+
+.upcoming-session-student-name {
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #111827;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: left;
+}
+
+.upcoming-session-student-name:hover {
+    color: #0b5f82;
+    text-decoration: underline;
+}
+
+.upcoming-session-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.upcoming-session-avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

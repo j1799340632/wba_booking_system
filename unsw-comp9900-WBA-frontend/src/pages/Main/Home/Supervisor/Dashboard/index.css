@@ -1,0 +1,670 @@
+.supervisor-dashboard-main {
+    flex: 1;
+    min-width: 0;
+    padding: 40px 90px;
+    text-align: left;
+}
+
+.supervisor-dashboard-container {
+    max-width: 1240px;
+    margin: 0 auto;
+}
+
+.supervisor-dashboard-title {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 800;
+    color: #111827;
+}
+
+.supervisor-dashboard-subtitle {
+    margin: 8px 0 0;
+    color: #6b7280;
+    font-size: 15px;
+}
+
+.supervisor-dashboard-error {
+    margin-top: 24px;
+    padding: 14px 18px;
+    background: #fef2f2;
+    color: #b91c1c;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.supervisor-dashboard-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: 32px;
+}
+
+.supervisor-dashboard-card {
+    background: white;
+    border-radius: 16px;
+    padding: 22px 24px;
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
+}
+
+.supervisor-dashboard-card.is-clickable {
+    cursor: pointer;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.supervisor-dashboard-card.is-clickable:hover {
+    box-shadow: 0 6px 16px rgba(16, 24, 40, 0.1);
+    transform: translateY(-2px);
+}
+
+.supervisor-dashboard-card.is-clickable:focus-visible {
+    outline: 2px solid #0b4f71;
+    outline-offset: 2px;
+}
+
+.supervisor-dashboard-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.supervisor-dashboard-card-label {
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.supervisor-dashboard-card-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.supervisor-dashboard-card-value {
+    font-size: 34px;
+    font-weight: 800;
+    color: #111827;
+    margin-top: 10px;
+}
+
+.supervisor-dashboard-card-sub {
+    color: #9ca3af;
+    font-size: 13px;
+    margin-top: 2px;
+}
+
+.supervisor-dashboard-banner {
+    margin-top: 24px;
+    border-radius: 14px;
+    padding: 18px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.supervisor-dashboard-banner.available {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+}
+
+.supervisor-dashboard-banner.unavailable {
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+}
+
+.supervisor-dashboard-banner-left {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.supervisor-dashboard-banner-title {
+    font-weight: 700;
+    color: #111827;
+    font-size: 15px;
+}
+
+.supervisor-dashboard-banner-text {
+    color: #6b7280;
+    font-size: 13px;
+    margin-top: 2px;
+}
+
+.supervisor-dashboard-banner-note {
+    color: #9ca3af;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.supervisor-dashboard-toggle-button,
+.supervisor-dashboard-add-slots-button {
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.supervisor-dashboard-toggle-button.available {
+    background: #16a34a;
+}
+
+.supervisor-dashboard-toggle-button.unavailable,
+.supervisor-dashboard-add-slots-button {
+    background: #ea580c;
+}
+
+.supervisor-dashboard-toggle-button.is-disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.supervisor-dashboard-bookings-panel {
+    margin-top: 24px;
+    background: white;
+    border-radius: 16px;
+    padding: 24px 26px;
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
+}
+
+.supervisor-dashboard-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.supervisor-dashboard-panel-title {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.supervisor-dashboard-view-all-button {
+    border: none;
+    background: transparent;
+    color: #0b4f71;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.supervisor-dashboard-empty {
+    margin: 0;
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+.supervisor-dashboard-booking-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.supervisor-dashboard-booking-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #eef2f6;
+    border-radius: 12px;
+    padding: 14px 18px;
+}
+
+.supervisor-dashboard-booking-left {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+
+.supervisor-dashboard-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #dbeafe;
+    color: #1d4ed8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.supervisor-dashboard-student-name {
+    font-weight: 700;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.supervisor-dashboard-booking-meta {
+    color: #6b7280;
+    font-size: 13px;
+    margin-top: 3px;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.supervisor-dashboard-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.supervisor-dashboard-status-pill {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.supervisor-dashboard-type-tag {
+    background: #e0f2fe;
+    color: #0b4f71;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+@media (max-width: 1024px) {
+    .supervisor-dashboard-main {
+        padding: 80px 36px;
+    }
+
+    .supervisor-dashboard-container {
+        max-width: 100%;
+    }
+
+    .supervisor-dashboard-stat-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .supervisor-dashboard-main {
+        padding: 80px 16px 24px;
+    }
+
+    .supervisor-dashboard-title {
+        font-size: 26px;
+    }
+
+    .supervisor-dashboard-subtitle {
+        font-size: 14px;
+    }
+
+    .supervisor-dashboard-stat-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .supervisor-dashboard-card,
+    .supervisor-dashboard-bookings-panel {
+        padding: 18px;
+    }
+
+    .supervisor-dashboard-card-value {
+        font-size: 30px;
+    }
+
+    .supervisor-dashboard-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .supervisor-dashboard-banner-left {
+        align-items: flex-start;
+    }
+
+    .supervisor-dashboard-toggle-button,
+    .supervisor-dashboard-add-slots-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .supervisor-dashboard-panel-header {
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .supervisor-dashboard-booking-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .supervisor-dashboard-booking-left {
+        width: 100%;
+        align-items: flex-start;
+    }
+
+    .supervisor-dashboard-booking-meta {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .supervisor-dashboard-status-pill {
+        align-self: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .supervisor-dashboard-main {
+        padding: 76px 12px 20px;
+    }
+
+    .supervisor-dashboard-title {
+        font-size: 24px;
+    }
+
+    .supervisor-dashboard-card,
+    .supervisor-dashboard-bookings-panel {
+        padding: 16px;
+        border-radius: 12px;
+    }
+
+    .supervisor-dashboard-card-icon {
+        width: 34px;
+        height: 34px;
+    }
+
+    .supervisor-dashboard-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 13px;
+    }
+
+    .supervisor-dashboard-student-name {
+        font-size: 15px;
+    }
+
+}
+
+/* =========================
+ Notification header
+ ========================= */
+
+.supervisor-dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+}
+
+.supervisor-dashboard-notification-button {
+    position: relative;
+    display: flex;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #ffffff;
+    color: #475569;
+    cursor: pointer;
+    appearance: none;
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.08);
+}
+
+.supervisor-dashboard-notification-button:hover {
+    background: #f8fafc;
+    box-shadow: 0 6px 16px rgba(16, 24, 40, 0.1);
+    transform: translateY(-2px);
+}
+
+.supervisor-dashboard-notification-red-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 11px;
+    height: 11px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    background: #dc2626;
+}
+
+/* =========================
+   Overlay
+   ========================= */
+
+.supervisor-dashboard-notification-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: rgba(15, 23, 42, 0.3);
+    appearance: none;
+}
+
+/* =========================
+   Notification drawer
+   ========================= */
+
+.supervisor-dashboard-notification-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: auto;
+    z-index: 9999;
+    display: flex;
+    width: min(420px, 100vw);
+    height: 100vh;
+    margin: 0;
+    flex-direction: column;
+    background: #ffffff;
+    color: #111827;
+    box-shadow: -10px 0 35px rgba(15, 23, 42, 0.18);
+    transform: translateX(100%);
+    visibility: hidden;
+    opacity: 0;
+    transition: transform 0.3s ease,
+    opacity 0.3s ease,
+    visibility 0.3s ease;
+}
+
+.supervisor-dashboard-notification-drawer.is-open {
+    transform: translateX(0);
+    visibility: visible;
+    opacity: 1;
+}
+
+.supervisor-dashboard-notification-header {
+    display: flex;
+    flex-shrink: 0;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 26px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #ffffff;
+}
+
+.supervisor-dashboard-notification-heading {
+    margin: 0;
+    color: #111827;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.supervisor-dashboard-notification-summary {
+    margin: 5px 0 0;
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.supervisor-dashboard-notification-close {
+    display: flex;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+    color: #475569;
+    cursor: pointer;
+    appearance: none;
+}
+
+.supervisor-dashboard-notification-close:hover {
+    background: #f1f5f9;
+}
+
+.supervisor-dashboard-notification-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    background: #ffffff;
+}
+
+.supervisor-dashboard-notification-item {
+    display: flex;
+    width: 100%;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 20px 26px;
+    border-bottom: 1px solid #eef2f6;
+    background: #ffffff;
+    color: #111827;
+}
+
+.supervisor-dashboard-notification-item:first-child {
+    background: #f6faff;
+}
+
+.supervisor-dashboard-notification-icon {
+    display: flex;
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.supervisor-dashboard-notification-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.supervisor-dashboard-notification-content h3 {
+    margin: 0;
+    color: #111827;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.supervisor-dashboard-notification-content p {
+    margin: 6px 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.supervisor-dashboard-notification-content span {
+    display: block;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.supervisor-dashboard-notification-empty {
+    display: flex;
+    min-height: 260px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    color: #94a3b8;
+    text-align: center;
+}
+
+.supervisor-dashboard-notification-empty p {
+    margin: 14px 0 4px;
+    color: #475569;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.supervisor-dashboard-notification-empty span {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+@media (max-width: 768px) {
+    .supervisor-dashboard-notification-drawer {
+        width: min(380px, 100vw);
+    }
+
+    .supervisor-dashboard-notification-header {
+        padding: 22px 20px;
+    }
+
+    .supervisor-dashboard-notification-item {
+        padding: 18px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .supervisor-dashboard-header {
+        gap: 12px;
+    }
+
+    .supervisor-dashboard-notification-button {
+        width: 42px;
+        height: 42px;
+    }
+
+    .supervisor-dashboard-notification-drawer {
+        width: 100vw;
+    }
+}
+
+.supervisor-dashboard-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #dbeafe;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2563eb;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.supervisor-dashboard-avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

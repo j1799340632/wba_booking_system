@@ -1,0 +1,8 @@
+.main-content {
+  width: 100%;
+  color: white;
+  background-color: #f6f7f9;
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+}

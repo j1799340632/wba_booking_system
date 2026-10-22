@@ -1,0 +1,103 @@
+services:
+  # 1. Require MySQL8+
+  mysql:
+    image: mysql:latest
+    container_name: wba-mysql
+    restart: no
+    environment:
+      # The password of root user
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
+      # Create database unsw_wba
+      MYSQL_DATABASE: unsw_wba
+      # Create UNSWWBA user
+      MYSQL_USER: UNSWWBA
+      # The password of UNSWWBA user
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      # Mount initialization script
+      - ./mysql-init.sql:/docker-entrypoint-initdb.d/init.sql
+      # Data persist
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-p$$MYSQL_ROOT_PASSWORD" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # 2. Require Redis 6+
+  redis:
+    image: redis:latest
+    container_name: wba-redis
+    restart: no
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Set REDIS_PASSWORD in .env}
+    command: ["sh", "-c", 'exec redis-server /usr/local/etc/redis/redis.conf --requirepass "$$REDIS_PASSWORD"']
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      # Data persist
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", 'REDISCLI_AUTH="$$REDIS_PASSWORD" redis-cli ping | grep -q PONG']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # 3. Spring Boot 后端
+  backend:
+    build:
+      # Point to the root directory of the backend code
+      context: ./unsw-WBA-backend
+    container_name: wba-backend
+    restart: no
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - LOGGING_LEVEL=info
+      - SPRING_MAIL_HOST=${SPRING_MAIL_HOST:-smtp.gmail.com}
+      - SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME:-}
+      - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD:-}
+      - GOOGLE_CALENDAR_CLIENT_ID=${GOOGLE_CALENDAR_CLIENT_ID:-}
+      - GOOGLE_CALENDAR_CLIENT_SECRET=${GOOGLE_CALENDAR_CLIENT_SECRET:-}
+      # You can override the database/Redis connection address in application.yml here using environment variables.
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/unsw_wba?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Australia/Sydney&rewriteBatchedStatements=true&cachePrepStmts=true&prepStmtCacheSize=250&prepStmtCacheSqlLimit=2048&useServerPrepStmts=true
+      - SPRING_DATASOURCE_USERNAME=UNSWWBA
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
+      - REDISSON_URI=redis://redis:6379
+      - REDISSON_PASSWORD=${REDIS_PASSWORD:?Set REDIS_PASSWORD in .env}
+      # Manage heap memory, enable generational ZGC (supported by default in Java 21/25), and add automatic log export for troubleshooting when heap memory overflows
+      - JAVA_TOOL_OPTIONS=-XX:+UseZGC -XX:InitialRAMPercentage=50 -XX:MaxRAMPercentage=70 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/app/file -XX:+ExitOnOutOfMemoryError
+    volumes:
+      # Mount the logBack container to the logs folder in the current directory of the host machine
+      - ./logs:/app/logBack
+      # The backend maps /app/file to a virtual cloud drive named upload_files
+      - upload_files:/app/file
+
+  # 4. React front-end + Nginx
+  frontend:
+    build:
+      # Point to the root directory of your front-end code
+      context: ./unsw-comp9900-WBA-frontend
+    container_name: wba-frontend
+    restart: no
+    ports:
+      - "8000:80"
+    depends_on:
+      - backend
+    volumes:
+      # Mount the same shared volume into the Nginx container
+      - upload_files:/usr/share/nginx/html/file
+
+volumes:
+  mysql_data:
+  redis_data:
+  upload_files:

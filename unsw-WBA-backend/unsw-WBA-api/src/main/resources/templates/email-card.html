@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Template</title>
+  <style>
+    /* Page */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      color: #333333;
+    }
+    .wrapper {
+      width: 100%;
+      table-layout: fixed;
+      background-color: #f4f6f9;
+      padding: 40px 0;
+    }
+    .main-card {
+      background-color: #ffffff;
+      margin: 0 auto;
+      width: 100%;
+      max-width: 600px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      border: 1px solid #eef2f7;
+    }
+    /* Banner */
+    .header-bar {
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+      padding: 32px 40px;
+      color: #ffffff;
+    }
+    .header-bar h2 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .greeting {
+      margin-top: 10px;
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    .username {
+      font-weight: 700;
+      color: #ffffff;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    /* Content */
+    .content-body {
+      padding: 36px 40px;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #4b5563;
+    }
+    .message-box {
+      background-color: #f8fafc;
+      border-left: 4px solid #6366f1;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      color: #1e293b;
+    }
+    /* Divide line */
+    .divider {
+      height: 1px;
+      background-color: #f1f5f9;
+      margin: 0 40px;
+    }
+    /* Footer */
+    .footer-bar {
+      padding: 24px 40px;
+      background-color: #fafafa;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: #9ca3af;
+    }
+    .footer-brand {
+      font-weight: 600;
+      color: #6b7280;
+    }
+    .footer-date {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    /* Small screen device */
+    @media screen and (max-width: 600px) {
+      .wrapper { padding: 12px 0; }
+      .header-bar, .content-body, .footer-bar { padding-left: 20px !important; padding-right: 20px !important; }
+      .main-card { border-radius: 8px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+  <table role="presentation" class="main-card" cellspacing="0" cellpadding="0">
+    <!-- Header -->
+    <tr>
+      <td class="header-bar">
+        <h2>${title}</h2>
+        <div class="greeting">Dear <span class="username">${username}</span>: </div>
+      </td>
+    </tr>
+
+    <!-- Content -->
+    <tr>
+      <td class="content-body">
+        <div class="message-box">
+          ${content}
+        </div>
+      </td>
+    </tr>
+
+    <!-- Divide line -->
+    <tr>
+      <td><div class="divider"></div></td>
+    </tr>
+
+    <!-- Footer -->
+    <tr>
+      <td class="footer-bar">
+        <table width="100%" cellspacing="0" cellpadding="0">
+          <tr>
+            <td align="left" class="footer-brand">
+              From: ${personal}
+            </td>
+            <td align="right" class="footer-date">
+              ${sendDate}
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
+</html>

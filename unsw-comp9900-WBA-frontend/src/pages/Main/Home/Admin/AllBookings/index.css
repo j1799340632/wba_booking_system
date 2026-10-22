@@ -1,0 +1,449 @@
+.all-bookings-main {
+    flex: 1;
+    min-width: 0;
+    padding: 24px 32px;
+    box-sizing: border-box;
+    background: #f4f7fb;
+}
+
+.all-bookings-container {
+    width: 100%;
+    max-width: 1240px;
+    margin: 0 auto;
+}
+
+.all-bookings-header {
+    margin-bottom: 18px;
+}
+
+.all-bookings-title {
+    margin: 0;
+    color: #172033;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.all-bookings-record-count {
+    margin: 4px 0 0;
+    color: #5f7691;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Filters */
+
+.all-bookings-filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+}
+
+.all-bookings-filter-icon {
+    flex-shrink: 0;
+    color: #7b8794;
+}
+
+.all-bookings-search,
+.all-bookings-select {
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    box-sizing: border-box;
+    background: #ffffff;
+    color: #334155;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.all-bookings-search {
+    width: 230px;
+}
+
+.all-bookings-select {
+    min-width: 160px;
+    cursor: pointer;
+}
+
+.all-bookings-hospital-select {
+    width: 280px;
+}
+
+.all-bookings-search::placeholder {
+    color: #9aa6b2;
+}
+
+.all-bookings-search:focus,
+.all-bookings-select:focus {
+    border-color: #0b5c7d;
+    box-shadow: 0 0 0 3px rgba(11, 92, 125, 0.1);
+}
+
+.all-bookings-search-button,
+.all-bookings-reset-button {
+    height: 38px;
+    padding: 0 14px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background-color 0.2s ease,
+    border-color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.all-bookings-search-button {
+    border: 1px solid #0b5c7d;
+    background: #0b5c7d;
+    color: #ffffff;
+}
+
+.all-bookings-search-button:hover:not(:disabled) {
+    border-color: #084a66;
+    background: #084a66;
+}
+
+.all-bookings-reset-button {
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #475569;
+}
+
+.all-bookings-reset-button:hover:not(:disabled) {
+    background: #f8fafc;
+}
+
+.all-bookings-search-button:disabled,
+.all-bookings-reset-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* Error */
+
+.all-bookings-error {
+    margin: 0 0 14px;
+    color: #dc2626;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Table */
+
+.all-bookings-table-card {
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid #e4eaf0;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(42, 62, 80, 0.05);
+}
+
+.all-bookings-table-wrapper {
+    overflow: auto;
+}
+
+.all-bookings-table {
+    /* 1. 将 min-width 改为 width: 100% */
+    width: 100%;
+    /* 2. 添加 min-width 保证内容多时依然能撑开滚动，防止挤压 */
+    min-width: max-content;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.all-bookings-table th,
+.all-bookings-table td {
+    box-sizing: border-box;
+    padding: 17px 18px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.all-bookings-table thead {
+    background: #e7f0f6;
+}
+
+.all-bookings-table th {
+    color: #536b7d;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    width: 160px;
+}
+
+.all-bookings-table td {
+    color: #273444;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+.all-bookings-table tbody tr {
+    min-height: 68px;
+    border-bottom: 1px solid #dbe3ea;
+    transition: background-color 0.2s ease;
+}
+
+.all-bookings-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.all-bookings-table tbody tr:hover {
+    background: #f8fbfd;
+}
+
+/* Student */
+
+.all-bookings-student {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.all-bookings-student-name {
+    color: #202a36;
+    font-weight: 700;
+}
+
+.all-bookings-student-id {
+    color: #6f8496;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* Cell content */
+
+.all-bookings-hospital {
+    display: block;
+    color: #4e6578;
+    font-size: 12px;
+    line-height: 1.45;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.all-bookings-date {
+    color: #273444;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.all-bookings-wba-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 22px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: #e4f0f7;
+    color: #23516c;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* Status */
+
+.all-bookings-status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 22px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.all-bookings-status-badge.completed {
+    background: #e3f5e7;
+    color: #397545;
+}
+
+.all-bookings-status-badge.confirmed {
+    background: #d5f0f5;
+    color: #317184;
+}
+
+.all-bookings-status-badge.pending {
+    background: #fff0bf;
+    color: #936d12;
+}
+
+.all-bookings-status-badge.declined,
+.all-bookings-status-badge.canceled {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.all-bookings-status-badge.unknown {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+/* Empty/loading row */
+
+.all-bookings-empty {
+    height: 150px;
+    color: #7b8a99 !important;
+    text-align: center !important;
+    font-weight: 500 !important;
+}
+
+/* Pagination */
+
+.all-bookings-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 14px;
+    margin-top: 20px;
+    color: #475569;
+    font-size: 14px;
+}
+
+.all-bookings-pagination button {
+    min-width: 76px;
+    padding: 8px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #334155;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.all-bookings-pagination button:hover:not(:disabled) {
+    background: #f8fafc;
+}
+
+.all-bookings-pagination button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* Medium screens */
+
+@media (max-width: 1200px) {
+    .all-bookings-main {
+        padding: 24px 32px;
+    }
+
+    .all-bookings-container {
+        max-width: 100%;
+    }
+
+    .all-bookings-table th,
+    .all-bookings-table td {
+        padding: 15px 13px;
+    }
+
+    .all-bookings-search {
+        width: 210px;
+    }
+
+    .all-bookings-hospital-select {
+        width: 250px;
+    }
+}
+
+@media (max-width: 900px) {
+    .all-bookings-main {
+        padding: 24px 20px;
+    }
+
+    .all-bookings-filters {
+        align-items: stretch;
+    }
+
+    .all-bookings-search {
+        width: calc(50% - 5px);
+    }
+
+    .all-bookings-hospital-select,
+    .all-bookings-select {
+        flex: 1;
+    }
+
+    .all-bookings-table th,
+    .all-bookings-table td {
+        padding: 14px 10px;
+        font-size: 12px;
+    }
+}
+
+/* Mobile */
+
+@media (max-width: 700px) {
+    .all-bookings-main {
+        padding: 24px 20px;
+    }
+
+    .all-bookings-title {
+        font-size: 26px;
+    }
+
+    .all-bookings-filter-icon {
+        display: none;
+    }
+
+    .all-bookings-filters {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .all-bookings-search,
+    .all-bookings-select,
+    .all-bookings-hospital-select,
+    .all-bookings-search-button,
+    .all-bookings-reset-button {
+        width: 100%;
+    }
+
+    .all-bookings-table-card {
+        overflow-x: auto;
+        border-radius: 10px;
+    }
+
+    .all-bookings-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .all-bookings-table {
+        min-width: 880px;
+    }
+
+    .all-bookings-pagination {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .all-bookings-main {
+        padding: 24px 12px;
+    }
+
+    .all-bookings-title {
+        font-size: 24px;
+    }
+
+    .all-bookings-table th,
+    .all-bookings-table td {
+        padding: 12px;
+    }
+}

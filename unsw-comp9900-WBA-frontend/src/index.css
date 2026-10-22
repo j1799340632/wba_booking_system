@@ -1,0 +1,91 @@
+:root {
+  height: 100vh;
+  width: 100vw;
+
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Transition */
+html {
+  transition: filter 0.25s ease, background-color 0.25s ease;
+}
+
+/* Activate site-wide color inversion when data-theme="dark" */
+html[data-theme='dark'] {
+  filter: invert(1) hue-rotate(180deg);
+  /* Prevent white spots from appearing at the edges and bottom of the filter */
+  background-color: #000000;
+}
+
+/* Protect elements that do not require color inversion: images, videos, avatars, maps, etc. */
+html[data-theme='dark'] img,
+html[data-theme='dark'] video,
+html[data-theme='dark'] canvas,
+html[data-theme='dark'] .header-avatar-box,
+html[data-theme='dark'] .no-invert {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+img, button {
+  user-select: none;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+/* -------------------- The animation when route changes ------------------- */
+
+/* Turn off the default cross fade-in/fade-out */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Define the animation for the old page leaving: move to the left and dim */
+::view-transition-old(root) {
+  animation: slide-out-to-left 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Define the animation for the new page entrance: fly in from the right */
+::view-transition-new(root) {
+  animation: slide-in-from-right 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes slide-out-to-left {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(-20%); opacity: 0; }
+}
+
+@keyframes slide-in-from-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}

@@ -1,0 +1,9 @@
+.home-container {
+    flex: 1;
+    height: 100vh;
+    overflow: auto;
+}
+
+.home-div {
+    flex: 1;
+}
