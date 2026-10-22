@@ -16,6 +16,9 @@ public class AssessmentSlotQueryDto extends BaseQueryDto {
     @Schema(description = "supervisorId")
     private Long supervisorId;
 
+    @Schema(description = "Supervisor name substring; combined with supervisorId when both are supplied")
+    private String supervisorName;
+
     @Schema(description = "Hospital fuzzy query")
     private String hospital;
 

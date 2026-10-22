@@ -28,8 +28,6 @@ import {
   MapPin,
 } from "lucide-react";
 
-import { notify } from "@/utils/notify.js";
-
 import BaseModal from "@/components/BaseModal/index.jsx";
 
 import { sendNotification } from "@/config/request/api/sendNotificationApi.js";
@@ -37,14 +35,17 @@ import { notificationEvent } from "@/utils/sse/sseEventChannel.js";
 import {Loading} from "@/components/Loading/index.jsx";
 import {useUserStore} from "@/config/store/useUserStore.js";
 import AssessmentSlotRepeatTypeEnum from "@/config/constant/AssessmentSlotRepeatTypeEnum.js";
+import {
+  EMPTY_BOOKING_FILTERS,
+  buildBookingSearchParams,
+  getBookingSearchError,
+  formatBookingDate as formatDate,
+  formatBookingTime as formatTime,
+} from "@/utils/bookingSearch.js";
 
 const DEFAULT_PAGE_QUANTITY = 10;
 
-const EMPTY_FILTERS = {
-  hospital: "",
-  department: "",
-  type: "",
-};
+const EMPTY_FILTERS = EMPTY_BOOKING_FILTERS;
 
 function extractPageData(response) {
   return (
@@ -96,6 +97,9 @@ export default function BookSlotStudent() {
 
   const [typeFilter, setTypeFilter] =
     useState("");
+  const [supervisorFilter, setSupervisorFilter] = useState("");
+  const [startTimeFilter, setStartTimeFilter] = useState("");
+  const [endTimeFilter, setEndTimeFilter] = useState("");
 
   const [appliedFilters, setAppliedFilters] =
     useState(EMPTY_FILTERS);
@@ -128,25 +132,7 @@ export default function BookSlotStudent() {
       filters = appliedFilters,
       quantity = pageQuantity,
     } = {}) => {
-      const params = {
-        pageNum: targetPage,
-        pageQuantity: quantity,
-        isOrderByAvailableTime: true,
-      };
-
-      if (filters.hospital) {
-        params.hospital = filters.hospital;
-      }
-
-      if (filters.department) {
-        params.department = filters.department;
-      }
-
-      if (filters.type) {
-        params.type = filters.type;
-      }
-
-      return params;
+      return buildBookingSearchParams(filters, targetPage, quantity);
     },
     [
       appliedFilters,
@@ -394,7 +380,16 @@ export default function BookSlotStudent() {
       hospital: hospitalFilter,
       department: departmentFilter,
       type: typeFilter,
+      supervisorName: supervisorFilter,
+      startTime: startTimeFilter,
+      endTime: endTimeFilter,
     };
+
+    const validationError = getBookingSearchError(newFilters);
+    if (validationError) {
+      setErrorMessage(validationError);
+      return;
+    }
 
     setAppliedFilters(newFilters);
     setPageNum(1);
@@ -418,6 +413,9 @@ export default function BookSlotStudent() {
     setHospitalFilter("");
     setDepartmentFilter("");
     setTypeFilter("");
+    setSupervisorFilter("");
+    setStartTimeFilter("");
+    setEndTimeFilter("");
 
     setAppliedFilters(EMPTY_FILTERS);
     setPageNum(1);
@@ -488,52 +486,6 @@ export default function BookSlotStudent() {
     setShowBookingModal(false);
   };
 
-
-  const formatDate = (value) => {
-    if (!value) {
-      return "";
-    }
-
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) {
-      return "";
-    }
-
-    return date.toLocaleDateString(
-      "en-AU",
-      {
-        weekday: "short",
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }
-    );
-  };
-
-  /**
-   * Format time.
-   */
-  const formatTime = (value) => {
-    if (!value) {
-      return "";
-    }
-
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) {
-      return "";
-    }
-
-    return date.toLocaleTimeString(
-      "en-AU",
-      {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      }
-    );
-  };
 
   /**
    * Handle repeat slot time selection.
@@ -691,6 +643,29 @@ export default function BookSlotStudent() {
             Browse and book available assessment
             sessions
           </p>
+
+          <div className="book-slot-search-details">
+            <label className="book-slot-search-field">
+              Supervisor name
+              <input type="search" value={supervisorFilter} maxLength={50}
+                placeholder="All supervisors" disabled={loading}
+                onChange={(event) => setSupervisorFilter(event.target.value)} />
+            </label>
+            <label className="book-slot-search-field">
+              From (Sydney time)
+              <input type="datetime-local" value={startTimeFilter} disabled={loading}
+                onChange={(event) => setStartTimeFilter(event.target.value)} />
+            </label>
+            <label className="book-slot-search-field">
+              To (Sydney time)
+              <input type="datetime-local" value={endTimeFilter} disabled={loading}
+                onChange={(event) => setEndTimeFilter(event.target.value)} />
+            </label>
+            <p className="book-slot-search-hint">
+              Times use Australia/Sydney. Without dates, search covers the next 30 days.
+              You can search up to 90 days at a time.
+            </p>
+          </div>
 
           {/* Backend filter toolbar */}
           <div className="book-slot-filters">

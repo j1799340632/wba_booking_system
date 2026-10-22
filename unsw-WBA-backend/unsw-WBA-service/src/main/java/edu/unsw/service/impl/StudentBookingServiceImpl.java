@@ -25,6 +25,7 @@ import edu.unsw.domain.vo.BookingVo;
 import edu.unsw.domain.vo.AssessmentHistoryVo;
 import edu.unsw.service.enums.AssessmentBookingStatusEnum;
 import edu.unsw.service.StudentBookingService;
+import edu.unsw.service.StudentSlotSearchService;
 import edu.unsw.service.enums.AssessmentSlotRepeatTypeEnum;
 import edu.unsw.service.enums.AssessmentSlotStatusEnum;
 import edu.unsw.service.utils.FastExcelUtils;
@@ -48,23 +49,19 @@ public class StudentBookingServiceImpl extends ServiceImpl<AssessmentBookingMapp
     private final UserMapper userMapper;
     private final AssessmentSlotServiceImpl assessmentSlotServiceImpl;
     private final RedissonUtils redissonUtils;
+    private final StudentSlotSearchService studentSlotSearchService;
 
-    public StudentBookingServiceImpl(AssessmentSlotMapper assessmentSlotMapper, UserMapper userMapper, AssessmentSlotServiceImpl assessmentSlotServiceImpl, RedissonUtils redissonUtils) {
+    public StudentBookingServiceImpl(AssessmentSlotMapper assessmentSlotMapper, UserMapper userMapper, AssessmentSlotServiceImpl assessmentSlotServiceImpl, RedissonUtils redissonUtils, StudentSlotSearchService studentSlotSearchService) {
         this.assessmentSlotMapper = assessmentSlotMapper;
         this.userMapper = userMapper;
         this.assessmentSlotServiceImpl = assessmentSlotServiceImpl;
         this.redissonUtils = redissonUtils;
+        this.studentSlotSearchService = studentSlotSearchService;
     }
 
     @Override
     public Page<AssessmentSlotVo> getAvailableAssessmentSlotList(AssessmentSlotQueryDto assessmentSlotQueryDto) {
-        return assessmentSlotServiceImpl.getAssessmentSlotVoPage(assessmentSlotQueryDto,
-                queryWrapper ->
-                        queryWrapper
-                                .eq(AssessmentSlot::getStatus, AssessmentSlotStatusEnum.AVAILABLE.getCode())
-                                .eq(AssessmentSlot::getIsEnable, true)
-                                .ge(AssessmentSlot::getEndTime, LocalDateTime.now(ZoneId.systemDefault()))
-        );
+        return studentSlotSearchService.search(assessmentSlotQueryDto);
     }
 
     @Override

@@ -25,6 +25,10 @@ spring:
       enabled: true
 
 --- # Log
+wba:
+  booking:
+    time-zone: Australia/Sydney
+
 logging:
   level:
     edu.unsw: ${LOGGING_LEVEL:debug}

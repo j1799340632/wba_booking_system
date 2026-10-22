@@ -27,6 +27,48 @@
 
 /* ================= Filter Toolbar ================= */
 
+.book-slot-search-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: end;
+}
+
+.book-slot-search-field {
+    display: flex;
+    flex: 1 1 210px;
+    flex-direction: column;
+    gap: 6px;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.book-slot-search-field input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 9px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: white;
+    color: #111827;
+    font: inherit;
+}
+
+.book-slot-search-field input:focus-visible {
+    outline: 2px solid #0b4f71;
+    outline-offset: 2px;
+}
+
+.book-slot-search-hint {
+    flex: 1 0 100%;
+    margin: 0;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
 .book-slot-filters {
     margin: 28px 0 32px;
     display: flex;

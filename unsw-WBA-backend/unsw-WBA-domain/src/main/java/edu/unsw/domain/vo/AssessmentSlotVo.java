@@ -29,6 +29,9 @@ public class AssessmentSlotVo {
     @Schema(description = "Available time list")
     private List<List<LocalDateTime>> availableTimeList;
 
+    @Schema(description = "Business time zone used by student availability search")
+    private String timeZone;
+
     @Schema(description = "Available start time")
     private LocalDateTime startTime;
 

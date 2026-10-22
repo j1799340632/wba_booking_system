@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -121,7 +120,8 @@ public class RruleUtils {
             Collection<Period<LocalDateTime>> periods = vEvent.calculateRecurrenceSet(searchPeriod);
 
             // Get the duration of a single event
-            Duration duration = Duration.between(startFirst.atZone(ZoneId.systemDefault()), endFirst.atZone(ZoneId.systemDefault()));
+            // Stored times are local business times: recurrence must preserve their wall-clock duration.
+            Duration duration = Duration.between(startFirst, endFirst);
 
             // Extract LocalDateTime
             for (Period<LocalDateTime> periodInstance : periods) {
