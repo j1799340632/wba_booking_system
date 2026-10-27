@@ -29,7 +29,13 @@ CREATE TABLE `assessment_booking` (
                                       `edit_time` datetime DEFAULT NULL COMMENT 'Booking edit time',
                                       `is_delete` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Is deleted',
                                       `version` int NOT NULL DEFAULT '0' COMMENT 'Optimistic lock version',
+                                      `request_key` varchar(64) DEFAULT NULL,
+                                      `request_hash` char(64) DEFAULT NULL,
+                                      `management_key` varchar(64) DEFAULT NULL,
+                                      `replacement_booking_id` bigint DEFAULT NULL,
                                       PRIMARY KEY (`id`),
+                                      UNIQUE KEY `uk_booking_request` (`creator`,`request_key`),
+                                      UNIQUE KEY `uk_booking_management` (`creator`,`management_key`),
                                       KEY `idx_slot_status_del` (`assessment_slot_id`,`status`,`is_delete`) USING BTREE,
                                       KEY `idx_creator_status_del` (`creator`,`status`,`is_delete`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -467,3 +473,34 @@ INSERT INTO `wba_type` (`id`, `name`, `creator`, `is_enable`, `is_delete`, `crea
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- Additive schema, applied automatically ONLY to the isolated demo by local_demo.py.
+CREATE TABLE IF NOT EXISTS student_assessment_plan (
+    student_id BIGINT NOT NULL PRIMARY KEY,
+    start_date DATE NOT NULL,
+    deadline DATE NOT NULL,
+    goals_json LONGTEXT NOT NULL,
+    version INT NOT NULL,
+    create_time DATETIME NOT NULL,
+    edit_time DATETIME NOT NULL
+);
+
+-- Minimal assistant operation observations (no conversation or assessment content).
+CREATE TABLE IF NOT EXISTS assistant_event (
+    id BIGINT NOT NULL PRIMARY KEY,
+    actor_id BIGINT NOT NULL,
+    created_at DATETIME(6) NOT NULL,
+    stage VARCHAR(32) NOT NULL,
+    outcome VARCHAR(32) NOT NULL,
+    action VARCHAR(32) DEFAULT NULL,
+    elapsed_ms BIGINT NOT NULL,
+    alternative_groups INT NOT NULL DEFAULT 0,
+    model_calls INT NOT NULL DEFAULT 0,
+    model_name VARCHAR(80) DEFAULT NULL,
+    usage_known BOOLEAN NOT NULL DEFAULT FALSE,
+    prompt_tokens BIGINT DEFAULT NULL,
+    completion_tokens BIGINT DEFAULT NULL,
+    total_tokens BIGINT DEFAULT NULL,
+    KEY idx_assistant_created (created_at,stage,outcome),
+    KEY idx_assistant_actor (actor_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

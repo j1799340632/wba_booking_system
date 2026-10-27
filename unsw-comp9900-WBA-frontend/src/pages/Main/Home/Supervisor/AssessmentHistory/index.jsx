@@ -1,8 +1,9 @@
 import "./index.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pencil } from "lucide-react";
 import {exportAssessmentHistoryExcel, getAssessmentHistory} from "@/config/request/api/assessmentBookingApi.js";
-import {completeSlot} from "@/config/request/api/assessmentSlotApi.js";
+import {updateAssessmentResult} from "@/config/request/api/assessmentSlotApi.js";
+import { supervisorResultPayload } from "@/utils/supervisorBookings.js";
 import {downloadFile} from "@/utils/fileUtils.js";
 import {notify} from "@/utils/notify.js";
 import {Loading} from "@/components/Loading/index.jsx";
@@ -16,6 +17,8 @@ export default function AssessmentHistorySupervisor() {
   const [editScore, setEditScore] = useState("");
   const [editFeedback, setEditFeedback] = useState("");
   const [saving, setSaving] = useState(false);
+  const [editError, setEditError] = useState("");
+  const writeLock = useRef(false);
 
   const fetchAssessmentHistory = () => {
     Loading.show()
@@ -24,6 +27,7 @@ export default function AssessmentHistorySupervisor() {
         setError("");
         setHistoryList(data.data.records);
       })
+      .catch(failure => setError(failure.message || "Assessment history could not be loaded. Refresh to try again."))
       .finally(() => {
         Loading.hide()
       });
@@ -79,39 +83,34 @@ export default function AssessmentHistorySupervisor() {
   }
 
   const openEditModal = (item) => {
+    setEditError("");
     setEditItem(item);
     setEditScore(item.score ?? "");
     setEditFeedback(item.feedback ?? "");
   };
 
   const closeEditModal = () => {
-    if (saving) return;
+    if (writeLock.current) return;
     setEditItem(null);
     setEditScore("");
     setEditFeedback("");
   };
 
-  const submitEdit = (e) => {
+  const submitEdit = async (e) => {
     e.preventDefault();
 
-    if (!editItem) return;
-
-    setSaving(true);
-    completeSlot({
-      bookingId: editItem.bookingId,
-      score: Number(editScore),
-      feedback: editFeedback,
-    })
-      .then(() => {
+    if (!editItem || writeLock.current) return;
+    writeLock.current = true; setSaving(true); setEditError("");
+    try {
+      const response = await updateAssessmentResult(supervisorResultPayload(editItem, editScore, editFeedback));
+      if (!response?.data?.bookingId) throw new Error("No update receipt was received.");
         notify.success("Assessment updated successfully!");
         setEditItem(null);
         setEditScore("");
         setEditFeedback("");
         fetchAssessmentHistory();
-      })
-      .finally(() => {
-        setSaving(false);
-      });
+    } catch (failure) { setEditError(`${failure.message || "No update response was received."} Retry the same update or close and refresh history.`); }
+    finally { writeLock.current = false; setSaving(false); }
   };
 
   return (
@@ -129,6 +128,7 @@ export default function AssessmentHistorySupervisor() {
             </p>
           </section>
 
+          <button type="button" className="assessment-refresh-button" disabled={saving || Boolean(editItem)} onClick={fetchAssessmentHistory}>Refresh history</button>
           <button
               type="button"
               onClick={exportAssessmentHistory}
@@ -221,13 +221,13 @@ export default function AssessmentHistorySupervisor() {
         onClose={closeEditModal}
       >
         {editItem && (
-          <form onSubmit={submitEdit} className="assessment-history-edit-card">
+          <form onSubmit={submitEdit} className="assessment-history-edit-card" role="dialog" aria-modal="true" aria-label="Edit assessment result">
             <div className="assessment-history-edit-heading">
               <h3 className="assessment-history-edit-form-title">
                 Edit Assessment
               </h3>
               <p className="assessment-history-edit-form-subtitle">
-                Update the score and feedback for this assessment.
+                Update the score and feedback. The original completion date and completed count are preserved.
               </p>
             </div>
 
@@ -242,10 +242,12 @@ export default function AssessmentHistorySupervisor() {
               Score
               <input
                 id="edit-score"
+                aria-label="Score"
                 name="score"
                 type="number"
                 className="assessment-history-edit-input"
                 value={editScore}
+                disabled={saving}
                 onChange={(e) => setEditScore(e.target.value)}
                 max={100}
                 min={0}
@@ -261,15 +263,18 @@ export default function AssessmentHistorySupervisor() {
               Feedback
               <textarea
                 id="edit-feedback"
+                aria-label="Feedback"
                 name="feedback"
                 className="assessment-history-edit-textarea"
                 value={editFeedback}
+                disabled={saving}
                 onChange={(e) => setEditFeedback(e.target.value)}
                 maxLength={255}
                 required
               />
             </label>
 
+            {editError && <p role="alert" className="supervisor-session-error">{editError}</p>}
             <div className="assessment-history-edit-actions">
               <button
                 type="button"

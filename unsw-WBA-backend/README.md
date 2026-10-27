@@ -11,7 +11,6 @@ This system serves as the backend service for the project, employing a high-perf
 ---
 
 ## Overview
-- Build date: 2026-06-17 15:54
 - Java version: 25
 - Key Components version：
     - spring-boot-dependencies 4.1.0

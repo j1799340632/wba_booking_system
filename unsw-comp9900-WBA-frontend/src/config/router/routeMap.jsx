@@ -11,11 +11,13 @@ import {
   LucideWarehouse
 } from "lucide-react";
 import DashboardPageAdmin from "@/pages/Main/Home/Admin/Dashboard/index.jsx";
+import AssistantInsightsPage from "@/pages/Main/Home/Admin/AssistantInsights/index.jsx";
 import DashboardPageStudent from "@/pages/Main/Home/Student/Dashboard/index.jsx";
 import DashboardPageSupervisor from "@/pages/Main/Home/Supervisor/Dashboard/index.jsx";
 import BookSlotStudent from "@/pages/Main/Home/Student/BookSlot/index.jsx";
 import MyBookingsStudent from "@/pages/Main/Home/Student/MyBooking/index.jsx";
 import AssessmentHistoryStudent from "@/pages/Main/Home/Student/AssessmentHistory/index.jsx";
+import AssessmentPlanPage from "@/pages/Main/Home/Student/AssessmentPlan/index.jsx";
 import SlotsSupervisor from "@/pages/Main/Home/Supervisor/Slot/index.jsx";
 import UpcomingSessionSupervisor from "@/pages/Main/Home/Supervisor/UpcomingSession/index.jsx";
 import AssessmentHistorySupervisor from "@/pages/Main/Home/Supervisor/AssessmentHistory/index.jsx";
@@ -57,6 +59,13 @@ export const SUPER_ADMIN_ROUTES = [
       title: "Dashboard",
       icon: LayoutDashboard,
     },
+    showInMenu: true,
+  },
+  {
+    path: "/home/super-admin/assistant-insights",
+    element: <AssistantInsightsPage />,
+    roles: [SUPER_ADMIN_ROLE_ID],
+    handle: { title: "AI Insights", icon: ClipboardList },
     showInMenu: true,
   },
   {
@@ -130,6 +139,13 @@ export const ADMIN_ROUTES = [
       title: "Dashboard",
       icon: LayoutDashboard,
     },
+    showInMenu: true,
+  },
+  {
+    path: "/home/admin/assistant-insights",
+    element: <AssistantInsightsPage />,
+    roles: [ADMIN_ROLE_ID],
+    handle: { title: "AI Insights", icon: ClipboardList },
     showInMenu: true,
   },
   {
@@ -258,6 +274,13 @@ export const SUPERVISOR_ROUTES = [
 ]
 
 export const STUDENT_ROUTES = [
+  {
+    path: '/home/student/assessment-plan',
+    element: <AssessmentPlanPage />,
+    roles: [STUDENT_ROLE_ID],
+    handle: { title: 'Assessment Plan', icon: ClipboardList },
+    showInMenu: true,
+  },
   {
     path: '/home/student/dashboard',
     element: <DashboardPageStudent />,

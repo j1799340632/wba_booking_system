@@ -23,6 +23,8 @@ import edu.unsw.domain.vo.AssessmentSlotVo;
 import edu.unsw.domain.vo.UpcomingSessionVo;
 import edu.unsw.domain.dto.AssessmentCompletionDto;
 import edu.unsw.service.AssessmentSlotService;
+import edu.unsw.service.SupervisorBookingService;
+import edu.unsw.domain.vo.SupervisorBookingResult;
 import edu.unsw.service.enums.AssessmentBookingStatusEnum;
 import edu.unsw.service.enums.AssessmentSlotRepeatTypeEnum;
 import edu.unsw.service.enums.AssessmentSlotStatusEnum;
@@ -51,11 +53,13 @@ public class AssessmentSlotServiceImpl extends ServiceImpl<AssessmentSlotMapper,
     private final UserMapper userMapper;
     private final AssessmentBookingMapper assessmentBookingMapper;
     private final RedissonUtils redissonUtils;
+    private final SupervisorBookingService supervisorBookings;
 
-    public AssessmentSlotServiceImpl(UserMapper userMapper, AssessmentBookingMapper assessmentBookingMapper, RedissonUtils redissonUtils) {
+    public AssessmentSlotServiceImpl(UserMapper userMapper, AssessmentBookingMapper assessmentBookingMapper, RedissonUtils redissonUtils, SupervisorBookingService supervisorBookings) {
         this.userMapper = userMapper;
         this.assessmentBookingMapper = assessmentBookingMapper;
         this.redissonUtils = redissonUtils;
+        this.supervisorBookings = supervisorBookings;
     }
 
     @Override
@@ -325,232 +329,37 @@ public class AssessmentSlotServiceImpl extends ServiceImpl<AssessmentSlotMapper,
     }
 
     @Override
-    public Page<UpcomingSessionVo> getUpcomingSession(AssessmentSlotQueryDto assessmentSlotQueryDto) {
-        return getSessionPage(assessmentSlotQueryDto, AssessmentBookingStatusEnum.PENDING.getCode());
+    public Page<UpcomingSessionVo> getUpcomingSession(AssessmentSlotQueryDto query) {
+        return supervisorBookings.sessions(query,0);
     }
 
     @Override
-    public Page<UpcomingSessionVo> getApprovedSession(AssessmentSlotQueryDto assessmentSlotQueryDto) {
-        return getSessionPage(assessmentSlotQueryDto, AssessmentBookingStatusEnum.CONFIRMED.getCode());
-    }
-
-    private Page<UpcomingSessionVo> getSessionPage(AssessmentSlotQueryDto assessmentSlotQueryDto, Integer bookingStatus) {
-        Integer pageNum = assessmentSlotQueryDto.getPageNum();
-        Integer pageQuantity = assessmentSlotQueryDto.getPageQuantity();
-
-        CurrentUser currentUser = CurrentUserUtils.getUser();
-        Long supervisorId = currentUser.getId();
-        List<AssessmentSlot> assessmentSlotList = this.lambdaQuery()
-                .eq(AssessmentSlot::getCreator, supervisorId)
-                .ne(AssessmentSlot::getStatus, AssessmentSlotStatusEnum.COMPLETED.getCode())
-                .list();
-
-        if (assessmentSlotList.isEmpty()) {
-            return new Page<>(pageNum, pageQuantity);
-        }
-
-        Page<AssessmentBooking> assessmentBookingPage = assessmentBookingMapper.selectPage(
-                new Page<>(pageNum, pageQuantity),
-                Wrappers.lambdaQuery(AssessmentBooking.class)
-                        .in(AssessmentBooking::getAssessmentSlotId, assessmentSlotList.stream().map(AssessmentSlot::getId).toList())
-                        .eq(AssessmentBooking::getStatus, bookingStatus)
-                        .orderByDesc(AssessmentBooking::getStartTime)
-        );
-
-        Page<UpcomingSessionVo> upcomingSessionVoPage = new Page<>();
-        BeanUtils.copyProperties(assessmentBookingPage, upcomingSessionVoPage);
-        upcomingSessionVoPage.setRecords(new ArrayList<>());
-
-        List<AssessmentBooking> assessmentBookingList = assessmentBookingPage.getRecords();
-
-        if (assessmentBookingList.isEmpty()) {
-            return new Page<>(pageNum, pageQuantity);
-        }
-
-        assessmentBookingList.forEach(item -> {
-            Optional<AssessmentSlot> first = assessmentSlotList.stream().filter(i -> i.getId().equals(item.getAssessmentSlotId())).findFirst();
-            if (first.isPresent()) {
-                AssessmentSlot assessmentSlot = first.get();
-
-                UpcomingSessionVo upcomingSessionVo = new UpcomingSessionVo();
-                BeanUtils.copyProperties(assessmentSlot, upcomingSessionVo);
-
-                upcomingSessionVo.setBookingId(item.getId());
-                upcomingSessionVo.setStartTime(item.getStartTime());
-                upcomingSessionVo.setEditTime(item.getEditTime());
-                Long creator = item.getCreator();
-                upcomingSessionVo.setStudentId(creator);
-                User bookingUser = userMapper.selectById(creator);
-                upcomingSessionVo.setStudentName(bookingUser.getName());
-
-                // Calculate the duration of the assessment slot
-                String duration = Duration.between(item.getStartTime().atZone(ZoneId.systemDefault()), item.getEndTime().atZone(ZoneId.systemDefault())).toMinutes() + "min";
-                upcomingSessionVo.setDuration(duration);
-
-                upcomingSessionVo.setCreatorName(bookingUser.getName());
-                upcomingSessionVo.setCreatorAvatar(bookingUser.getAvatar());
-
-                upcomingSessionVoPage.getRecords().add(upcomingSessionVo);
-            }
-        });
-
-        return upcomingSessionVoPage;
+    public Page<UpcomingSessionVo> getApprovedSession(AssessmentSlotQueryDto query) {
+        return supervisorBookings.sessions(query,1);
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public void approveSlot(Long id, Long bookingId) {
-        checkTheBookingValidTime(bookingId);
-        updateBookingStatus(bookingId, AssessmentBookingStatusEnum.CONFIRMED.getCode(), AssessmentBookingStatusEnum.PENDING.getCode());
+    public SupervisorBookingResult approveSlot(Long id,Long bookingId,Integer version) {
+        return supervisorBookings.decide(SupervisorBookingService.Action.APPROVE,id,bookingId,version,null);
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public void declineSlot(Long id, Long bookingId, Boolean isEnable) {
-        updateBookingStatus(bookingId, AssessmentBookingStatusEnum.DECLINED.getCode(), AssessmentBookingStatusEnum.PENDING.getCode());
-
-        AssessmentSlot slot = this.getById(id);
-        LocalDateTime nextAvailableTime = calculateRemainAvailableTime(slot);
-
-        // If status is not null or this slot is a repeatable slot, just keep this slot's status available
-        isEnable = checkAndSetSlotStatus(isEnable, slot);
-
-        updateSlotStatusAndNextAvailableTime(id, nextAvailableTime, isEnable);
+    public SupervisorBookingResult declineSlot(Long id,Long bookingId,Boolean isEnable,Integer version) {
+        return supervisorBookings.decide(SupervisorBookingService.Action.DECLINE,id,bookingId,version,isEnable);
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public void cancelSlot(Long id, Long bookingId, Boolean isEnable) {
-        updateBookingStatus(bookingId, AssessmentBookingStatusEnum.CANCELED.getCode(), AssessmentBookingStatusEnum.CONFIRMED.getCode());
-
-        AssessmentSlot slot = this.getById(id);
-        LocalDateTime nextAvailableTime = calculateRemainAvailableTime(slot);
-
-        // If status is not null or this slot is a repeatable slot, just keep this slot's status available
-        isEnable = checkAndSetSlotStatus(isEnable, slot);
-
-        updateSlotStatusAndNextAvailableTime(id, nextAvailableTime, isEnable);
-    }
-
-    private void checkTheBookingValidTime(Long bookingId) {
-        AssessmentBooking assessmentBooking = assessmentBookingMapper.selectOne(
-                Wrappers.<AssessmentBooking>lambdaQuery()
-                        .select(AssessmentBooking::getStartTime, AssessmentBooking::getEndTime)
-                        .eq(AssessmentBooking::getId, bookingId)
-        );
-
-        if (Objects.isNull(assessmentBooking)) {
-            throw new BusinessException("Booking not found");
-        }
-
-        // If the end time of this booking has already passed the current time
-        if (assessmentBooking.getEndTime().isBefore(LocalDateTime.now(ZoneId.systemDefault()))) {
-            throw new BusinessException("The booking time has passed");
-        }
-    }
-
-    /**
-     * If the status is not null or this slot is a repeatable slot, just keep this slot's status available
-     *
-     * @param isEnable expected to update
-     * @param slot slot
-     * @return final status
-     */
-    private boolean checkAndSetSlotStatus(Boolean isEnable, AssessmentSlot slot) {
-        // If the status is not null or this slot is a repeatable slot, just keep this slot's status available
-        if (Objects.isNull(isEnable) || !Objects.equals(AssessmentSlotRepeatTypeEnum.NO_REPEAT.getCode(), slot.getRepeatType())) {
-            return true;
-        }
-        return isEnable;
-    }
-
-    private void updateBookingStatus(Long id, Integer status, Integer previousStatus) {
-        // Need to update version
-        AssessmentBooking assessmentBooking = assessmentBookingMapper.selectOne(
-                Wrappers.<AssessmentBooking>lambdaQuery()
-                        .select(AssessmentBooking::getId, AssessmentBooking::getVersion)
-                        .eq(AssessmentBooking::getId, id)
-        );
-        LambdaUpdateWrapper<AssessmentBooking> lambdaUpdateWrapper = Wrappers.lambdaUpdate();
-        lambdaUpdateWrapper.eq(AssessmentBooking::getId, id);
-        lambdaUpdateWrapper.eq(AssessmentBooking::getStatus, previousStatus);
-        lambdaUpdateWrapper.set(AssessmentBooking::getStatus, status);
-        int updated = assessmentBookingMapper.update(assessmentBooking, lambdaUpdateWrapper);
-        if (updated == 0) {
-            throw new BusinessException(ResponseEnum.DATA_SAVE_FAILED.getCode(), "The booking data has changed, please refresh and try again");
-        }
-    }
-
-    private void updateSlotStatusAndNextAvailableTime(Long id, LocalDateTime nextAvailableTime, Boolean targetIsEnable) {
-        // No need to update version
-        LambdaUpdateWrapper<AssessmentSlot> lambdaUpdateWrapper = Wrappers.lambdaUpdate();
-        lambdaUpdateWrapper.eq(AssessmentSlot::getId, id);
-        lambdaUpdateWrapper.set(AssessmentSlot::getIsEnable, targetIsEnable);
-        lambdaUpdateWrapper.set(AssessmentSlot::getStatus, AssessmentSlotStatusEnum.AVAILABLE.getCode());
-        lambdaUpdateWrapper.set(AssessmentSlot::getNextAvailableTime, nextAvailableTime);
-        boolean updated = this.update(lambdaUpdateWrapper);
-        if (!updated) {
-            throw new BusinessException(ResponseEnum.DATA_SAVE_FAILED.getCode(), "Update the status of slot failed");
-        }
+    public SupervisorBookingResult cancelSlot(Long id,Long bookingId,Boolean isEnable,Integer version) {
+        return supervisorBookings.decide(SupervisorBookingService.Action.CANCEL,id,bookingId,version,isEnable);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void markAssessmentCompleted(AssessmentCompletionDto assessmentCompletionDto) {
-        CurrentUser currentUser = CurrentUserUtils.getUser();
+    public SupervisorBookingResult markAssessmentCompleted(AssessmentCompletionDto request) {
+        return supervisorBookings.complete(request);
+    }
 
-        AssessmentBooking booking =
-                assessmentBookingMapper.selectById(
-                        assessmentCompletionDto.getBookingId());
-
-        if (Objects.isNull(booking)) {
-            throw new BusinessException(
-                    ResponseEnum.DATA_NOT_QUERIED.getCode(),
-                    "Booking does not exist"
-            );
-        }
-
-        AssessmentSlot slot = this.getById(booking.getAssessmentSlotId());
-        if (Objects.isNull(slot)) {
-            throw new BusinessException(
-                    ResponseEnum.DATA_NOT_QUERIED.getCode(),
-                    "Assessment slot does not exist"
-            );
-        }
-
-        if (!Objects.equals(slot.getCreator(), currentUser.getId())) {
-            throw new BusinessException(ResponseEnum.NO_PERMISSION);
-        }
-
-        LocalDateTime completedTime = LocalDateTime.now(ZoneId.systemDefault());
-
-        // Need to check and update version
-        booking.setVersion(assessmentCompletionDto.getVersion());
-        booking.setStatus(AssessmentBookingStatusEnum.COMPLETED.getCode());
-        booking.setScore(assessmentCompletionDto.getScore());
-        booking.setFeedback(assessmentCompletionDto.getFeedback());
-        booking.setCompletedTime(completedTime);
-
-        if (assessmentBookingMapper.updateById(booking) == 0) {
-            throw new BusinessException(ResponseEnum.DATA_SAVE_FAILED.getCode(), "Data has changed, please refresh and try again");
-        }
-
-        // No need to update optimistic lock version, so use updateWrapper to prevent auto-update
-        LambdaUpdateWrapper<AssessmentSlot> slotUpdateWrapper = Wrappers.lambdaUpdate();
-        slotUpdateWrapper.eq(AssessmentSlot::getId, slot.getId());
-
-        if (Objects.equals(AssessmentSlotRepeatTypeEnum.NO_REPEAT.getCode(), slot.getRepeatType())) {
-            slotUpdateWrapper.set(AssessmentSlot::getStatus, AssessmentSlotStatusEnum.COMPLETED.getCode());
-        } else {
-            LocalDateTime nextAvailableTime = calculateRemainAvailableTime(slot);
-            if (Objects.nonNull(nextAvailableTime)) {
-                slotUpdateWrapper.set(AssessmentSlot::getStatus, AssessmentSlotStatusEnum.AVAILABLE.getCode());
-                slotUpdateWrapper.set(AssessmentSlot::getNextAvailableTime, nextAvailableTime);
-            }
-        }
-
-        if (!this.update(slotUpdateWrapper)) {
-            throw new BusinessException(ResponseEnum.DATA_SAVE_FAILED);
-        }
+    @Override
+    public SupervisorBookingResult updateAssessmentResult(AssessmentCompletionDto request) {
+        return supervisorBookings.correct(request);
     }
 }

@@ -13,6 +13,8 @@ import {
   getMyBookings,
   getAssessmentHistory,
 } from "@/config/request/api/assessmentBookingApi.js";
+import { getAssessmentPlan } from "@/config/request/api/assessmentPlanApi.js";
+import { planDeadlineLabel } from "@/utils/assessmentPlan.js";
 import { useUserStore } from "@/config/store/useUserStore.js";
 
 export default function DashboardPageStudent() {
@@ -21,14 +23,18 @@ export default function DashboardPageStudent() {
   const user = useUserStore((state) => state.userInfo);
   const firstName = (user?.name || "there").split(" ")[0];
 
+  const [assessmentPlan, setAssessmentPlan] = useState(null);
+  const [planError, setPlanError] = useState("");
   const [bookings, setBookings] = useState([]);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
   const startGetDashboardData = () => {
-    Promise.all([getMyBookings(1, -1), getAssessmentHistory(1, -1)])
-      .then(([bookingRes, historyRes]) => {
+    Promise.all([getMyBookings(1, -1), getAssessmentHistory(1, -1), getAssessmentPlan(undefined, true).then(response => ({ plan: response.data })).catch(error => ({ error: error.message || "Unable to load assessment targets." }))])
+      .then(([bookingRes, historyRes, planRes]) => {
+        setAssessmentPlan(planRes.plan || null);
+        setPlanError(planRes.error || "");
         setBookings(bookingRes.data.records ?? []);
         setHistory(historyRes.data.records ?? []);
       })
@@ -60,20 +66,6 @@ export default function DashboardPageStudent() {
     scores.length === 0
       ? "—"
       : (scores.reduce((sum, n) => sum + n, 0) / scores.length).toFixed(1);
-
-  const typeCounts = new Map();
-
-  history.forEach((h) => {
-    const type = (h.wbaType || "").trim() || "Unspecified";
-    typeCounts.set(type, (typeCounts.get(type) ?? 0) + 1);
-  });
-
-  const typeBreakdown = Array.from(typeCounts, ([key, done]) => ({
-    key,
-    done,
-  })).sort((a, b) => b.done - a.done);
-
-  const REQUIRED_PER_TYPE = 10;
 
   return (
     <div>
@@ -204,34 +196,35 @@ export default function DashboardPageStudent() {
             <Panel>
               <div className="student-dashboard-panel-header">
                 <h2 className="student-dashboard-panel-title">
-                  WBA Progress by Type
+                  Assessment Targets
                 </h2>
 
                 <button
-                  onClick={() => navigate("/home/student/assessment-history")}
+                  onClick={() => navigate("/home/student/assessment-plan")}
                   className="student-dashboard-view-all-button"
                 >
-                  View all <ChevronRight size={16} />
+                  View plan <ChevronRight size={16} />
                 </button>
               </div>
 
               {loading ? (
                 <p className="student-dashboard-empty">Loading…</p>
-              ) : typeBreakdown.length === 0 ? (
+              ) : planError ? <p className="student-dashboard-empty">{planError}</p> : !assessmentPlan?.configured ? (
                 <p className="student-dashboard-empty">
-                  No completed assessments yet.
+                  Set your personal targets and placement dates to track progress.
                 </p>
               ) : (
                 <div className="student-dashboard-progress-list">
-                  {typeBreakdown.map((t) => (
-                    <div key={t.key}>
+                  <p className="student-dashboard-empty">{planDeadlineLabel(assessmentPlan)} · {assessmentPlan.followUpCounts?.needsAttention || 0} booking status check(s) · {assessmentPlan.followUpCounts?.awaitingApproval || 0} awaiting approval. Open your plan for next actions.</p>
+                  {assessmentPlan.goals.map((t) => (
+                    <div key={t.typeId}>
                       <div className="student-dashboard-progress-row">
                         <span className="student-dashboard-progress-name">
-                          {t.key}
+                          {t.type}
                         </span>
 
                         <span className="student-dashboard-progress-count">
-                          {t.done}/{REQUIRED_PER_TYPE}
+                          {t.completed}/{t.target}
                         </span>
                       </div>
 
@@ -241,7 +234,7 @@ export default function DashboardPageStudent() {
                           style={{
                             width: `${Math.min(
                               100,
-                              Math.round((t.done / REQUIRED_PER_TYPE) * 100)
+                              Math.round((t.completed / t.target) * 100)
                             )}%`,
                           }}
                         />

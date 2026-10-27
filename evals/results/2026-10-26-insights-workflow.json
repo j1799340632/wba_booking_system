@@ -1,0 +1,170 @@
+{
+  "scope": "Synthetic local integration acceptance only; not production metrics or intent accuracy.",
+  "executedAt": "2026-10-26T10:10:39.991Z",
+  "providerCallsInThisFinalRun": 2,
+  "fixtureObservationsBackdatedOnlyForPeriodTesting": true,
+  "businessTimestampsChangedForPeriodTesting": false,
+  "summary": {
+    "bookingConfirmAttempts": 3,
+    "bookingConfirmFailures": 1,
+    "bookingConfirmReplays": 1,
+    "callsWithKnownUsage": 2,
+    "completionTokens": 129,
+    "days": [
+      {
+        "clarify": 1,
+        "date": "2026-10-25",
+        "newBookingRequests": 1,
+        "noResults": 0,
+        "ready": 1,
+        "searches": 2,
+        "unavailable": 0
+      }
+    ],
+    "droppedEventsSinceRestart": 0,
+    "endDate": "2026-10-25",
+    "firstRecordedAt": "2026-10-25 12:00:00",
+    "generatedAt": "2026-10-26 21:10:37",
+    "modelCalls": 2,
+    "models": [
+      {
+        "calls": 2,
+        "knownUsage": 2,
+        "modelName": "deepseek-flash",
+        "totalTokens": 5405
+      }
+    ],
+    "newBookingRequests": 1,
+    "observedOperations": 10,
+    "promptTokens": 5276,
+    "searchP50Ms": 813,
+    "searchP95Ms": 1388,
+    "searchRequests": 2,
+    "searchWithAlternatives": 0,
+    "stages": [
+      {
+        "action": null,
+        "attempts": 1,
+        "completionTokens": 0,
+        "knownUsage": 0,
+        "modelCalls": 0,
+        "outcome": "REJECTED",
+        "promptTokens": 0,
+        "stage": "CONFIRM_BOOKING",
+        "totalTokens": 0,
+        "withAlternatives": 0
+      },
+      {
+        "action": null,
+        "attempts": 1,
+        "completionTokens": 0,
+        "knownUsage": 0,
+        "modelCalls": 0,
+        "outcome": "REPLAYED",
+        "promptTokens": 0,
+        "stage": "CONFIRM_BOOKING",
+        "totalTokens": 0,
+        "withAlternatives": 0
+      },
+      {
+        "action": null,
+        "attempts": 1,
+        "completionTokens": 0,
+        "knownUsage": 0,
+        "modelCalls": 0,
+        "outcome": "SAVED",
+        "promptTokens": 0,
+        "stage": "CONFIRM_BOOKING",
+        "totalTokens": 0,
+        "withAlternatives": 0
+      },
+      {
+        "action": "CANCEL",
+        "attempts": 1,
+        "completionTokens": 0,
+        "knownUsage": 0,
+        "modelCalls": 0,
+        "outcome": "REPLAYED",
+        "promptTokens": 0,
+        "stage": "CONFIRM_MANAGEMENT",
+        "totalTokens": 0,
+        "withAlternatives": 0
+      },
+      {
+        "action": "CANCEL",
+        "attempts": 1,
+        "completionTokens": 0,
+        "knownUsage": 0,
+        "modelCalls": 0,
+        "outcome": "SAVED",
+        "promptTokens": 0,
+        "stage": "CONFIRM_MANAGEMENT",
+        "totalTokens": 0,
+        "withAlternatives": 0
+      },
+      {
+        "action": null,
+        "attempts": 1,
+        "completionTokens": 0,
+        "knownUsage": 0,
+        "modelCalls": 0,
+        "outcome": "REVIEW_READY",
+        "promptTokens": 0,
+        "stage": "PREPARE_BOOKING",
+        "totalTokens": 0,
+        "withAlternatives": 0
+      },
+      {
+        "action": "CANCEL",
+        "attempts": 1,
+        "completionTokens": 0,
+        "knownUsage": 0,
+        "modelCalls": 0,
+        "outcome": "REVIEW_READY",
+        "promptTokens": 0,
+        "stage": "PREPARE_MANAGEMENT",
+        "totalTokens": 0,
+        "withAlternatives": 0
+      },
+      {
+        "action": null,
+        "attempts": 1,
+        "completionTokens": 0,
+        "knownUsage": 0,
+        "modelCalls": 0,
+        "outcome": "READY",
+        "promptTokens": 0,
+        "stage": "REPLACEMENTS",
+        "totalTokens": 0,
+        "withAlternatives": 0
+      },
+      {
+        "action": null,
+        "attempts": 1,
+        "completionTokens": 27,
+        "knownUsage": 1,
+        "modelCalls": 1,
+        "outcome": "CLARIFY",
+        "promptTokens": 2624,
+        "stage": "SEARCH",
+        "totalTokens": 2651,
+        "withAlternatives": 0
+      },
+      {
+        "action": null,
+        "attempts": 1,
+        "completionTokens": 102,
+        "knownUsage": 1,
+        "modelCalls": 1,
+        "outcome": "READY",
+        "promptTokens": 2652,
+        "stage": "SEARCH",
+        "totalTokens": 2754,
+        "withAlternatives": 0
+      }
+    ],
+    "startDate": "2026-10-25",
+    "timeZone": "Australia/Sydney",
+    "totalTokens": 5405
+  }
+}

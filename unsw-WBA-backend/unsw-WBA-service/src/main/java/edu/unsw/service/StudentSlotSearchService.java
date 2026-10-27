@@ -104,6 +104,7 @@ public class StudentSlotSearchService {
         List<Match> matches = new ArrayList<>();
         for (AssessmentSlot slot : slots) {
             List<RruleUtils.Occurrence> times = occurrences(slot, start, end).stream()
+                    .filter(time -> matchesDailyConstraints(time, query))
                     .filter(time -> !occupied.getOrDefault(slot.getId(), Set.of()).contains(time.startTime()))
                     .sorted(Comparator.comparing(RruleUtils.Occurrence::startTime)).toList();
             if (!times.isEmpty()) {
@@ -132,10 +133,27 @@ public class StudentSlotSearchService {
     }
 
     private void validatePaging(AssessmentSlotQueryDto query) {
+        if (query.getEarliestTime() != null && query.getLatestTime() != null
+                && !query.getEarliestTime().isBefore(query.getLatestTime())) {
+            throw new BusinessException("Daily start time must be before daily end time");
+        }
+        if (query.getWeekdays() != null && (query.getWeekdays().size() > 7
+                || query.getWeekdays().stream().anyMatch(day -> day == null || day < 1 || day > 7))) {
+            throw new BusinessException("Weekdays must be numbers from 1 (Monday) to 7 (Sunday)");
+        }
         if (query.getPageNum() == null || query.getPageNum() < 1 || query.getPageQuantity() == null
                 || (query.getPageQuantity() != -1 && query.getPageQuantity() < 1)) {
             throw new BusinessException("Page number and page size must be positive (or page size -1 for all)");
         }
+    }
+
+    private boolean matchesDailyConstraints(RruleUtils.Occurrence time, AssessmentSlotQueryDto query) {
+        if (query.getWeekdays() != null && !query.getWeekdays().isEmpty()
+                && !query.getWeekdays().contains(time.startTime().getDayOfWeek().getValue())) return false;
+        if ((query.getEarliestTime() != null || query.getLatestTime() != null)
+                && !time.startTime().toLocalDate().equals(time.endTime().toLocalDate())) return false;
+        return (query.getEarliestTime() == null || !time.startTime().toLocalTime().isBefore(query.getEarliestTime()))
+                && (query.getLatestTime() == null || !time.endTime().toLocalTime().isAfter(query.getLatestTime()));
     }
 
     private List<RruleUtils.Occurrence> occurrences(AssessmentSlot slot, LocalDateTime start, LocalDateTime end) {

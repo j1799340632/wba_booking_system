@@ -29,11 +29,9 @@ import {
 } from "lucide-react";
 
 import BaseModal from "@/components/BaseModal/index.jsx";
+import BookingAssistant from "@/components/BookingAssistant/index.jsx";
 
-import { sendNotification } from "@/config/request/api/sendNotificationApi.js";
-import { notificationEvent } from "@/utils/sse/sseEventChannel.js";
 import {Loading} from "@/components/Loading/index.jsx";
-import {useUserStore} from "@/config/store/useUserStore.js";
 import AssessmentSlotRepeatTypeEnum from "@/config/constant/AssessmentSlotRepeatTypeEnum.js";
 import {
   EMPTY_BOOKING_FILTERS,
@@ -67,7 +65,8 @@ function extractDictionaryData(response) {
 }
 
 export default function BookSlotStudent() {
-  const userInfo = useUserStore((state) => state.userInfo);
+  const bookingRequestKey = useRef(null);
+  const bookingSubmitLock = useRef(false);
   const navigate = useNavigate();
   const topRef = useRef(null);
   const [hospitalOptions, setHospitalOptions] =
@@ -457,6 +456,7 @@ export default function BookSlotStudent() {
    * Open booking modal.
    */
   const openBookingModal = (slot) => {
+    bookingRequestKey.current = crypto.randomUUID();
     const availableTimes =
       getAvailableTimes(slot);
 
@@ -480,7 +480,8 @@ export default function BookSlotStudent() {
   /**
    * Close booking modal.
    */
-  const closeBookingModal = () => {
+  const closeBookingModal = (force = false) => {
+    if (bookingSubmitLock.current && force !== true) return;
     setSelectedSlot(null);
     setSelectedBookingTime(null);
     setShowBookingModal(false);
@@ -495,6 +496,7 @@ export default function BookSlotStudent() {
   ) => {
     const selectedValue =
       event.target.value;
+    bookingRequestKey.current = crypto.randomUUID();
 
     if (!selectedValue || !selectedSlot) {
       setSelectedBookingTime(null);
@@ -519,111 +521,35 @@ export default function BookSlotStudent() {
    * Confirm selected booking.
    */
   const confirmBooking = async () => {
-    if (
-      !selectedSlot ||
-      bookingLoading
-    ) {
-      return;
-    }
-
-    const availableTimes =
-      getAvailableTimes(selectedSlot);
-
-    const bookingTime =
-      selectedBookingTime ||
-      availableTimes[0];
-
+    if (!selectedSlot || bookingSubmitLock.current) return;
+    const bookingTime = selectedBookingTime || getAvailableTimes(selectedSlot)[0];
     if (!bookingTime) {
-      setErrorMessage(
-        "Please select an available time before confirming your booking."
-      );
-
+      setErrorMessage("Please select an available time before confirming your booking.");
       return;
     }
-
+    bookingSubmitLock.current = true;
     setBookingLoading(true);
     setErrorMessage("");
-
-    const bookingStartTime =
-      bookingTime.startTime;
-
-    const bookingEndTime =
-      bookingTime.endTime;
-
-    const wbaType =
-      selectedSlot.type ||
-      selectedSlot.wbaType;
-
-    const requestBody = {
-      assessmentSlotId: selectedSlot.id,
-      startTime: bookingStartTime,
-      endTime: bookingEndTime,
-      type: wbaType,
-      slotVersion: selectedSlot.version,
-    };
-
-    const supervisorId =
-      getSupervisorId(selectedSlot);
-
+    bookingRequestKey.current ||= crypto.randomUUID();
     try {
-      await bookings(requestBody);
-
-      closeBookingModal();
-
-      setSuccessMessage(
-        "Your assessment session has been booked successfully."
-      );
-
-      await fetchAvailableSlots(
-        buildParams({
-          targetPage: pageNum,
-          filters: appliedFilters,
-        })
-      );
-
-      if (supervisorId) {
-        const sessionType =
-          wbaType || "assessment";
-
-        const sessionDate =
-          formatDate(bookingStartTime);
-
-        const sessionTime =
-          formatTime(bookingStartTime);
-
-        await sendNotification({
-          receiverId: supervisorId,
-          eventName: notificationEvent,
-          eventContent:
-              `You have a new booking request for the ` +
-              `${sessionType} session on ${sessionDate} ` +
-              `at ${sessionTime}.`,
-          isSendEmail: true,
-        })
-
-        await sendNotification({
-          receiverId: userInfo?.id,
-          eventName: notificationEvent,
-          eventContent:
-              `You have booked for the ` +
-              `${sessionType} session on ${sessionDate} ` +
-              `at ${sessionTime}. You cannot cancel within 48 hours of the start time`,
-          isSendEmail: true,
-        })
+      const response = await bookings({
+        assessmentSlotId: selectedSlot.id, startTime: bookingTime.startTime, endTime: bookingTime.endTime,
+        slotVersion: selectedSlot.version, requestKey: bookingRequestKey.current,
+      });
+      if (!response?.data?.bookingId) throw new Error("No receipt received. Retry the same request or check My Bookings.");
+      closeBookingModal(true);
+      setSuccessMessage(response.data.status === 0
+        ? "Your booking request is saved and awaiting supervisor approval. In-app notifications are saved."
+        : "This booking request is already recorded. Check My Bookings for its current status.");
+      try {
+        await fetchAvailableSlots(buildParams({ targetPage: pageNum, filters: appliedFilters }));
+      } catch {
+        setErrorMessage("Your request was saved. Refresh the session list or check My Bookings.");
       }
     } catch (error) {
-      console.error(
-        "Failed to book slot:",
-        error
-      );
-
-      setErrorMessage(
-        error?.response?.data?.message ||
-          error?.response?.data?.msg ||
-          error?.message ||
-          "Failed to book the selected slot."
-      );
+      setErrorMessage(`${error.message || "No booking response received."} Retry this same request or check My Bookings before choosing another session.`);
     } finally {
+      bookingSubmitLock.current = false;
       setBookingLoading(false);
     }
   };
@@ -643,6 +569,8 @@ export default function BookSlotStudent() {
             Browse and book available assessment
             sessions
           </p>
+
+          <BookingAssistant onBooked={() => fetchAvailableSlots(buildParams({ targetPage: pageNum, filters: appliedFilters }))} />
 
           <div className="book-slot-search-details">
             <label className="book-slot-search-field">
@@ -1165,7 +1093,7 @@ export default function BookSlotStudent() {
             isOpen={Boolean(
               successMessage
             )}
-            title="Booking Successful"
+            title="Booking request saved"
             onClose={() =>
               setSuccessMessage("")
             }
@@ -1176,7 +1104,7 @@ export default function BookSlotStudent() {
               </div>
 
               <h2 className="book-slot-message-title">
-                Booking Successful
+                Booking request saved
               </h2>
 
               <p className="book-slot-message-text">

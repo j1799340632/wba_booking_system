@@ -68,6 +68,12 @@ services:
       - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD:-}
       - GOOGLE_CALENDAR_CLIENT_ID=${GOOGLE_CALENDAR_CLIENT_ID:-}
       - GOOGLE_CALENDAR_CLIENT_SECRET=${GOOGLE_CALENDAR_CLIENT_SECRET:-}
+      - BOOKING_AI_ENABLED=${BOOKING_AI_ENABLED:-false}
+      - BOOKING_AI_ENDPOINT=${BOOKING_AI_ENDPOINT:-https://api.deepseek.com/chat/completions}
+      - BOOKING_AI_MODEL=${BOOKING_AI_MODEL:-deepseek-flash}
+      - BOOKING_AI_API_KEY=${BOOKING_AI_API_KEY:-}
+      - BOOKING_AI_TIMEOUT_SECONDS=${BOOKING_AI_TIMEOUT_SECONDS:-20}
+      - BOOKING_AI_DISABLE_THINKING=${BOOKING_AI_DISABLE_THINKING:-true}
       # You can override the database/Redis connection address in application.yml here using environment variables.
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/unsw_wba?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Australia/Sydney&rewriteBatchedStatements=true&cachePrepStmts=true&prepStmtCacheSize=250&prepStmtCacheSqlLimit=2048&useServerPrepStmts=true
       - SPRING_DATASOURCE_USERNAME=UNSWWBA

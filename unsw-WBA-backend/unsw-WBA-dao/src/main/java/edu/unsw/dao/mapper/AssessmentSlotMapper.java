@@ -16,6 +16,19 @@ import java.util.List;
  */
 @Mapper
 public interface AssessmentSlotMapper extends BaseMapper<AssessmentSlot> {
+    @Select("SELECT * FROM assessment_slot WHERE id=#{id} FOR UPDATE")
+    AssessmentSlot lockForBooking(@Param("id") Long id);
+
+    @Select("SELECT * FROM assessment_slot WHERE id=#{id}")
+    AssessmentSlot selectIncludingDeleted(@Param("id") Long id);
+
+    @Select("""
+        <script>SELECT * FROM assessment_slot WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+        </script>
+        """)
+    List<AssessmentSlot> selectByIdsIncludingDeleted(@Param("ids") Collection<Long> ids);
+
     /**
      * Query slot ids and creators without applying logical-delete filtering.
      * Completed assessments remain part of a supervisor's history even when

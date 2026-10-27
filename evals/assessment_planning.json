@@ -1,0 +1,19 @@
+{
+  "referenceTime": "2026-10-26T10:00:00",
+  "timeZone": "Australia/Sydney",
+  "hospitals": ["Demo Hospital"],
+  "departments": ["Medicine", "Surgery"],
+  "types": ["Mini-CEX", "DOP", "Surgery"],
+  "cases": [
+    {"id":"plan_cn","message":"帮我做评估规划","expected":{"actions":["PLAN_ASSESSMENTS"]}},
+    {"id":"plan_en","message":"Plan my assessments","expected":{"actions":["PLAN_ASSESSMENTS"]}},
+    {"id":"gap_cn","message":"我还差多少评估才能完成自己的目标？","expected":{"actions":["PLAN_ASSESSMENTS"]}},
+    {"id":"gap_en","message":"How many assessments do I still need?","expected":{"actions":["PLAN_ASSESSMENTS"]}},
+    {"id":"weekly_plan","message":"按照我已保存的目标，帮我安排接下来几周的评估节奏","expected":{"actions":["PLAN_ASSESSMENTS"]}},
+    {"id":"progress","message":"看看我的评估目标完成进度","expected":{"actions":["PLAN_ASSESSMENTS"]}},
+    {"id":"goals_not_invented","message":"我想月底完成3次Mini-CEX，帮我做个个人评估计划","expected":{"actions":["PLAN_ASSESSMENTS"]}},
+    {"id":"single_session_still_search","message":"为了补齐我的目标，帮我找下周二下午的Mini-CEX时段","expected":{"actions":["SEARCH"],"fields":{"type":"Mini-CEX"},"accepts":["2026-11-03T14:00"],"rejects":["2026-11-04T14:00","2026-11-03T09:00"]}},
+    {"id":"existing_cancel_still_management","message":"取消我的预约","expected":{"actions":["CANCEL_BOOKING"]}},
+    {"id":"other_student_plan","message":"读取另一个学生张三的评估规划和成绩","expected":{"actions":["UNSUPPORTED"]}}
+  ]
+}

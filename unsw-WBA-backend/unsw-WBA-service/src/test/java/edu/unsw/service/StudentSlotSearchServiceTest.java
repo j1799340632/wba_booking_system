@@ -123,6 +123,59 @@ class StudentSlotSearchServiceTest {
     }
 
     @Test
+    void localModelHttpThroughRealSearchReturnsOnlyDatabaseCandidatesWithoutWriting() throws Exception {
+        var user = new User(); user.setId(10L); user.setRoleId(3L); user.setIsEnable(true); user.setIsCanceled(false);
+        users.updateById(user);
+        var day = LocalDateTime.of(2026, 10, 27, 0, 0);
+        addSlot(repeated(1L, day.minusDays(20).plusHours(14), "FREQ=DAILY;INTERVAL=1"));
+        addBooking(1L, 1L, day.plusHours(14), 0, false);
+        addSlot(slot(2L, 10L, day.plusHours(15)));
+        addSlot(slot(3L, 20L, day.plusHours(14)));
+        addSlot(slot(4L, 10L, day.plusHours(9)));
+
+        var dictionaries = org.mockito.Mockito.mock(DictionaryService.class);
+        var type = new edu.unsw.domain.entity.WbaType(); type.setName("Mini-CEX");
+        org.mockito.Mockito.when(dictionaries.getEnabledHospitals()).thenReturn(List.of());
+        org.mockito.Mockito.when(dictionaries.getEnabledDepartments()).thenReturn(List.of());
+        org.mockito.Mockito.when(dictionaries.getEnabledWbaTypes()).thenReturn(List.of(type));
+        var json = new tools.jackson.databind.json.JsonMapper();
+        var fixture = com.sun.net.httpserver.HttpServer.create(new java.net.InetSocketAddress("127.0.0.1", 0), 0);
+        fixture.createContext("/chat/completions", exchange -> {
+            exchange.getRequestBody().readAllBytes();
+            String content = """
+                    {"action":"SEARCH","type":"Mini-CEX","supervisorName":"Wang","supervisorMode":"REQUIRED",
+                     "startTime":"2026-10-27T00:00:00","endTime":"2026-10-28T00:00:00",
+                     "earliestTime":"12:00","latestTime":"18:00"}
+                    """;
+            byte[] response = json.writeValueAsBytes(Map.of("choices", List.of(Map.of("finish_reason", "stop",
+                    "message", Map.of("content", content)))));
+            exchange.sendResponseHeaders(200, response.length);
+            exchange.getResponseBody().write(response);
+            exchange.close();
+        });
+        fixture.start();
+        try {
+            var properties = new edu.unsw.core.config.BookingAiProperties();
+            properties.setEnabled(true); properties.setApiKey("local-fixture-key");
+            properties.setEndpoint("http://127.0.0.1:" + fixture.getAddress().getPort() + "/chat/completions");
+            var parser = new edu.unsw.service.assistant.JsonBookingIntentParser(properties);
+            var assistant = new edu.unsw.service.assistant.BookingAssistantService(parser, dictionaries, users, service, CLOCK,
+                    org.mockito.Mockito.mock(BookingManagementService.class), org.mockito.Mockito.mock(BookingSubmissionService.class), org.mockito.Mockito.mock(AssessmentPlanningService.class));
+            var request = new edu.unsw.domain.dto.BookingAssistantRequest();
+            request.setMessage("下周二下午的 Mini-CEX，必须 Wang 老师");
+            var result = assistant.search(request);
+            assertEquals(edu.unsw.domain.vo.BookingAssistantResult.Status.READY, result.getStatus());
+            assertEquals(1, result.getCandidates().size());
+            assertEquals("2", result.getCandidates().getFirst().getSlotId());
+            assertEquals(day.plusHours(15), result.getCandidates().getFirst().getStartTime());
+            assertEquals(1, bookings.selectCount(null));
+            assertEquals(4, slots.selectCount(null));
+        } finally {
+            fixture.stop(0);
+        }
+    }
+
+    @Test
     void returnsFutureRepeatsEvenWhenTheTemplateDateHasPassed() {
         var start = LocalDateTime.of(2026, 10, 27, 13, 0);
         addSlot(repeated(1L, LocalDateTime.of(2026, 10, 1, 14, 0), "FREQ=DAILY;INTERVAL=1"));
@@ -184,6 +237,28 @@ class StudentSlotSearchServiceTest {
         addSlot(slot(2L, 10L, start.minusMinutes(1)));
         addSlot(slot(3L, 10L, start.plusMinutes(1)));
         assertEquals(List.of(1L), service.search(query(start, start.plusMinutes(30))).getRecords().stream().map(v -> v.getId()).toList());
+    }
+
+    @Test
+    void filtersDailyTimeAndWeekdaysBeforePaging() {
+        var start = LocalDateTime.of(2026, 10, 26, 0, 0);
+        addSlot(repeated(1L, LocalDateTime.of(2026, 10, 1, 14, 0), "FREQ=DAILY;INTERVAL=1"));
+        addSlot(slot(2L, 10L, LocalDateTime.of(2026, 10, 27, 9, 0)));
+        addSlot(slot(3L, 10L, LocalDateTime.of(2026, 10, 27, 17, 45)));
+        var query = query(start, start.plusDays(7));
+        query.setEarliestTime(LocalTime.NOON);
+        query.setLatestTime(LocalTime.of(18, 0));
+        query.setWeekdays(List.of(2, 4));
+        query.setPageQuantity(1);
+        var page = service.search(query);
+        assertEquals(1, page.getTotal());
+        assertEquals(List.of(LocalDateTime.of(2026, 10, 27, 14, 0), LocalDateTime.of(2026, 10, 29, 14, 0)),
+                page.getRecords().getFirst().getAvailableTimeList().stream().map(time -> time.getFirst()).toList());
+        query.setEarliestTime(LocalTime.of(19, 0));
+        assertThrows(BusinessException.class, () -> service.search(query));
+        query.setEarliestTime(LocalTime.NOON);
+        query.setWeekdays(List.of(8));
+        assertThrows(BusinessException.class, () -> service.search(query));
     }
 
     @Test

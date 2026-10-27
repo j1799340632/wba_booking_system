@@ -3,6 +3,8 @@ package edu.unsw.dao.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import edu.unsw.domain.entity.User;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * @author 徐一杰 YijieXu Bubble
@@ -11,4 +13,6 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
+    @Select("SELECT * FROM `user` WHERE id=#{id} AND is_delete=0 FOR UPDATE")
+    User lockBookingParticipant(@Param("id") Long id);
 }

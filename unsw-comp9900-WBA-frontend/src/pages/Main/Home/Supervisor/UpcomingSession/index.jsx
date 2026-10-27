@@ -1,673 +1,121 @@
 import "./index.css";
-import {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
-import {Building2, CalendarDays, Check, Clock3, TriangleAlert, X,} from "lucide-react";
-import {
-  approveSlot,
-  cancelSlot,
-  completeSlot,
-  declineSlot,
-  getApprovedSession,
-  getUpcomingSession,
-} from "@/config/request/api/assessmentSlotApi.js";
-import {
-  addBookingToGoogleCalendar,
-  connectGoogleCalendar,
-  getGoogleCalendarStatus,
-} from "@/config/request/api/googleCalendarApi.js";
-import {notify} from "@/utils/notify.js";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { approveSlot, cancelSlot, completeSlot, declineSlot, getApprovedSession, getUpcomingSession } from "@/config/request/api/assessmentSlotApi.js";
+import { addBookingToGoogleCalendar, connectGoogleCalendar, getGoogleCalendarStatus } from "@/config/request/api/googleCalendarApi.js";
+import { supervisorBookingVersion, supervisorResultPayload } from "@/utils/supervisorBookings.js";
+import { formatBookingDate, formatBookingTime } from "@/utils/bookingSearch.js";
 import BaseModal from "@/components/BaseModal/index.jsx";
-import {useConfirmStore} from "@/config/store/useConfirmStore.js";
-import {useSse} from "@/utils/sse/useSse.js";
-import {notificationEvent} from "@/utils/sse/sseEventChannel.js";
-import {sendNotification} from "@/config/request/api/sendNotificationApi.js";
-import {Loading} from "@/components/Loading/index.jsx";
-import AssessmentSlotRepeatTypeEnum from "@/config/constant/AssessmentSlotRepeatTypeEnum.js";
+import { useSse } from "@/utils/sse/useSse.js";
+import { notificationEvent } from "@/utils/sse/sseEventChannel.js";
 
-function WBABadge({ type }) {
-  if (!type) return null;
+const actionLabels = { APPROVE: "Approve booking", DECLINE: "Decline booking", CANCEL: "Cancel confirmed session", COMPLETE: "Complete assessment" };
+const receiptLabels = { APPROVE: "Booking approved", DECLINE: "Booking declined", CANCEL: "Booking cancelled", COMPLETE: "Assessment completed" };
 
-  return <span className="upcoming-session-badge">{type}</span>;
+function SessionDetails({ booking }) {
+  return <><p>{formatBookingDate(booking.startTime)} · {formatBookingTime(booking.startTime)}–{booking.startTime?.slice(0, 10) !== booking.endTime?.slice(0, 10) && `${formatBookingDate(booking.endTime)} · `}{formatBookingTime(booking.endTime)} ({booking.timeZone || "Australia/Sydney"})</p>
+    <p>{[booking.hospital, booking.department, booking.location].filter(Boolean).join(" · ")}</p><small>Reference: {booking.bookingId}</small></>;
 }
 
 export default function UpcomingSessionSupervisor() {
-  const navigate = useNavigate();
-  const [approvedBookings, setApprovedBookings] = useState([]);
-  const [pendingBookings, setPendingBookings] = useState([]);
+  const [pending, setPending] = useState([]), [approved, setApproved] = useState([]);
+  const [loading, setLoading] = useState(true), [loadError, setLoadError] = useState("");
+  const [action, setAction] = useState(null), [busy, setBusy] = useState(false), [actionError, setActionError] = useState("");
+  const [checked, setChecked] = useState(false), [reopen, setReopen] = useState(true);
+  const [score, setScore] = useState(""), [feedback, setFeedback] = useState("");
+  const [receipt, setReceipt] = useState(null);
+  const [calendar, setCalendar] = useState(null), [calendarBusy, setCalendarBusy] = useState(null), [calendarNotice, setCalendarNotice] = useState("");
+  const writeLock = useRef(false), loadId = useRef(0);
 
-  const [showDeclineModal, setShowDeclineModal] = useState(false);
-  const [selectedBooking, setSelectedBooking] = useState(null);
-  const [returnSlot, setReturnSlot] = useState(true);
-
-  const [showCompleteModal, setShowCompleteModal] = useState(false);
-  const [showCancelModal, setShowCancelModal] = useState(false);
-  const [selectedCancelBooking, setSelectedCancelBooking] = useState(null);
-  const [calendarConnected, setCalendarConnected] = useState(false);
-
-  const [calendarStatusLoading, setCalendarStatusLoading] = useState(true);
-
-  const [calendarConnectLoading, setCalendarConnectLoading] = useState(false);
-
-  const [calendarLoadingId, setCalendarLoadingId] = useState(null);
-
-  const [addedCalendarBookingIds, setAddedCalendarBookingIds] = useState([]);
-
-  const loadGoogleCalendarStatus = () => {
-    setTimeout(() => {
-      setCalendarStatusLoading(true);
-    }, 0)
-
-    getGoogleCalendarStatus()
-      .then((result) => {
-        const connected =
-          result?.data?.connected ??
-          result?.data?.data?.connected ??
-          false;
-
-        setCalendarConnected(Boolean(connected));
-      })
-      .catch(() => {
-        setCalendarConnected(false);
-      })
-      .finally(() => {
-        setCalendarStatusLoading(false);
-      });
-  };
-
-  const handleConnectGoogleCalendar = () => {
-    setCalendarConnectLoading(true);
-
-    connectGoogleCalendar(window.location.pathname)
-      .then((result) => {
-        window.location.href = result?.data?.authorizationUrl;
-      })
-      .finally(() => {
-        setCalendarConnectLoading(false);
-      });
-  };
-
-  const handleAddBookingToCalendar = (booking) => {
-    const bookingId = booking.bookingId || booking.id;
-
-    setCalendarLoadingId(bookingId);
-
-    addBookingToGoogleCalendar(bookingId)
-      .then(() => {
-        setAddedCalendarBookingIds((previous) => [
-          ...previous,
-          bookingId,
-        ]);
-
-        notify.success(
-          "Added to Google Calendar."
-        );
-      })
-      .finally(() => {
-        setCalendarLoadingId(null);
-      });
-  };
-
-  const showConfirm = useConfirmStore((state) => state.showConfirm);
-
-  const formatDate = (time) => {
-    if (!time) return "No date";
-    const date = new Date(time.replace(" ", "T"));
-
-    return date.toLocaleDateString("en-AU", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-    });
-  };
-
-  const formatTime = (time) => {
-    if (!time) return "No time";
-    return time.slice(11, 16);
-  };
-
-  const getStudentName = (booking) => {
-    return booking.studentName || "Student";
-  };
-
-  const getInitials = (name) => {
-    return name
-      .split(" ")
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
-  const formatBooking = (booking) => ({
-    ...booking,
-    id: booking.id,
-    bookingId: booking.bookingId,
-    studentId: booking.studentId,
-    studentName: getStudentName(booking),
-    studentAvatar: booking.creatorAvatar || "",
-    type: booking.type || "WBA",
-    date: formatDate(booking.startTime),
-    time: formatTime(booking.startTime),
-    department: booking.department || booking.hospital || "No department",
-    status: booking.status,
-    raw: booking,
-  });
-
-  const loadSessions = async () => {
-    try {
-      Loading.show()
-
-      const [pendingRes, approvedRes] = await Promise.all([
-        getUpcomingSession(1, -1),
-        getApprovedSession(1, -1),
-      ]);
-
-      const pendingRecords = pendingRes?.data?.records || [];
-      const approvedRecords = approvedRes?.data?.records || [];
-
-      setPendingBookings(
-        pendingRecords.map((booking) =>
-          formatBooking(booking)
-        )
-      );
-
-      setApprovedBookings(
-        approvedRecords.map((booking) =>
-          formatBooking(booking)
-        )
-      );
-    } finally {
-      Loading.hide()
-    }
-  };
-
-  useEffect(() => {
-    void loadSessions();
-    loadGoogleCalendarStatus();
+  const load = useCallback(signal => {
+    const id = ++loadId.current;
+    return Promise.all([getUpcomingSession(1, -1, signal), getApprovedSession(1, -1, signal)]).then(([requests, sessions]) => {
+      if (id !== loadId.current || signal?.aborted) return;
+      if (!Array.isArray(requests?.data?.records) || !Array.isArray(sessions?.data?.records)) throw new Error("Session records could not be loaded.");
+      setPending(requests.data.records); setApproved(sessions.data.records); setLoadError("");
+    }).catch(error => { if (id === loadId.current && !signal?.aborted) setLoadError(error.message || "Unable to load sessions. Refresh to try again."); })
+      .finally(() => { if (id === loadId.current) setLoading(false); });
   }, []);
+  const refresh = () => { setLoading(true); return load(); };
+  useEffect(() => {
+    const controller = new AbortController(); void load(controller.signal);
+    getGoogleCalendarStatus().then(response => setCalendar(Boolean(response?.data?.connected))).catch(() => setCalendar(false));
+    return () => { loadId.current += 1; controller.abort(); };
+  }, [load]);
+  useSse(notificationEvent, () => { if (!writeLock.current) void refresh(); });
 
-  useSse(notificationEvent, () => {
-    void loadSessions()
-  });
-
-  const notifyStudent = (studentId, eventContent) => {
-    if (!studentId) return;
-    sendNotification({
-      receiverId: studentId,
-      eventName: notificationEvent,
-      eventContent,
-      isSendEmail: true,
-    }).catch((err) => console.log(err));
+  const open = (kind, booking) => {
+    if (writeLock.current) return;
+    setAction({ kind, booking }); setActionError(""); setChecked(false); setScore(""); setFeedback(""); setReopen(kind === "DECLINE");
   };
-
-  const handleApprove = (booking) => {
-    showConfirm("Reminder", "Are you sure to approve the booking?", () => {
-      approveSlot(booking.id, booking.bookingId).then(() => {
-        notify.success("Approved successfully!");
-        notifyStudent(
-          booking.studentId,
-          `Your booking for the ${booking.type} session on ${booking.date} at ${booking.time} has been approved.`
-        );
-        loadSessions();
-      });
-    });
+  const close = () => { if (!writeLock.current) { setAction(null); setActionError(""); } };
+  const submit = async event => {
+    event.preventDefault();
+    if (!action || !checked || writeLock.current) return;
+    writeLock.current = true; setBusy(true); setActionError("");
+    const { kind, booking } = action;
+    try {
+      const version = supervisorBookingVersion(booking);
+      const response = kind === "COMPLETE" ? await completeSlot(supervisorResultPayload(booking, score, feedback))
+        : kind === "APPROVE" ? await approveSlot(booking.id, booking.bookingId, version)
+          : kind === "DECLINE" ? await declineSlot(booking.id, booking.bookingId, reopen, version)
+            : await cancelSlot(booking.id, booking.bookingId, reopen, version);
+      if (!response?.data?.bookingId) throw new Error("No decision receipt was received.");
+      setReceipt({ ...response.data, label: receiptLabels[kind] }); setAction(null);
+      await refresh();
+    } catch (error) { setActionError(`${error.message || "No decision response was received."} Retry the same decision or close and refresh to check its status.`); }
+    finally { writeLock.current = false; setBusy(false); }
   };
-
-  const openDeclineModal = (booking) => {
-    setSelectedBooking(booking);
-    setReturnSlot(true);
-    setShowDeclineModal(true);
+  const updateCalendar = async booking => {
+    if (calendarBusy) return;
+    setCalendarBusy(booking.bookingId); setCalendarNotice("");
+    try {
+      if (calendar) { await addBookingToGoogleCalendar(booking.bookingId); setCalendarNotice("Added to Google Calendar."); }
+      else { const response = await connectGoogleCalendar(window.location.pathname); if (!response?.data?.authorizationUrl) throw new Error("Calendar connection is unavailable."); window.location.href = response.data.authorizationUrl; }
+    } catch (error) { setCalendarNotice(error.message || "Calendar update failed. Retry when available."); }
+    finally { setCalendarBusy(null); }
   };
-
-  const closeDeclineModal = () => {
-    setShowDeclineModal(false);
-    setSelectedBooking(null);
-    setReturnSlot(true);
-  };
-
-  const confirmDecline = () => {
-    declineSlot(selectedBooking.id, selectedBooking.bookingId, returnSlot).then(
-      () => {
-        notify.success("Declined successfully!");
-        notifyStudent(
-          selectedBooking.studentId,
-          `Your booking for the ${selectedBooking.type} session on ${selectedBooking.date} at ${selectedBooking.time} has been declined.`
-        );
-        closeDeclineModal();
-        loadSessions();
-      }
-    );
-  };
-
-  const confirmComplete = (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
-    const score = data.score;
-    const feedback = data.feedback;
-
-    completeSlot({
-      bookingId: selectedCancelBooking.bookingId,
-      score,
-      feedback,
-    }).then(() => {
-      notify.success("Completed successfully!");
-      notifyStudent(
-        selectedCancelBooking.studentId,
-        `Your assessment results for the ${selectedCancelBooking.type} session on ${selectedCancelBooking.date} are now available.`
-      );
-      closeComCompleteModal();
-      loadSessions();
-    });
-  };
-
-  const openCompleteModal = (booking) => {
-    setSelectedCancelBooking(booking);
-    setShowCompleteModal(true);
-  };
-
-  const closeComCompleteModal = () => {
-    setShowCompleteModal(false);
-    setSelectedCancelBooking(null);
-  };
-
-  const openCancelModal = (booking) => {
-    setSelectedCancelBooking(booking);
-    setShowCancelModal(true);
-  };
-
-  const closeCancelModal = () => {
-    setShowCancelModal(false);
-    setSelectedCancelBooking(null);
-  };
-
-  const confirmCancel = async () => {
-    cancelSlot(selectedCancelBooking.id, selectedCancelBooking.bookingId, returnSlot).then(
-      () => {
-        notify.success("Cancelled successfully!");
-        notifyStudent(
-          selectedCancelBooking.studentId,
-          `Your booking for the ${selectedCancelBooking.type} session on ${selectedCancelBooking.date} at ${selectedCancelBooking.time} has been cancelled.`
-        );
-        closeCancelModal();
-        loadSessions();
-      }
-    );
-  };
-
-  const BookingCard = ({ booking, showActions }) => (
-    <div className="upcoming-session-card">
-      <div className="upcoming-session-card-left">
-        <div
-          className="upcoming-session-avatar upcoming-session-clickable"
-          onClick={() =>
-            navigate(`/home/supervisor/student-profile?id=${booking.studentId}`)
-          }
-        >
-          {booking.studentAvatar ? (
-            <img
-              src={booking.studentAvatar}
-              alt={`${booking.studentName} avatar`}
-              className="upcoming-session-avatar-image"
-            />
-          ) : (
-            getInitials(booking.studentName)
-          )}
-        </div>
-
-        <div className="upcoming-session-card-content">
-        <div className="upcoming-session-name-row">
-            <button
-              type="button"
-              className="upcoming-session-student-name"
-              onClick={() => {
-                if (!booking.studentId) {
-                  notify.error("Student ID is unavailable.");
-                  return;
-                }
-
-                navigate(`/home/supervisor/student-profile?id=${booking.studentId}`);
-              }}
-            >
-              {booking.studentName}
-            </button>
-
-            <WBABadge type={booking.type} />
-          </div>
-
-          <div className="upcoming-session-detail-row">
-            <span className="upcoming-session-icon-text">
-              <CalendarDays size={14} />
-              {booking.date}
-            </span>
-
-            <span className="upcoming-session-icon-text">
-              <Clock3 size={14} />
-              {booking.time}
-            </span>
-
-            <span className="upcoming-session-icon-text">
-              <Building2 size={14} />
-              {booking.department}
-            </span>
-          </div>
-        </div>
-      </div>
-      {showActions ? (
-        <div className="upcoming-session-actions">
-          <button
-            onClick={() => handleApprove(booking)}
-            className="upcoming-session-button approve"
-          >
-            <Check size={15} />
-            Approve
-          </button>
-
-          <button
-            onClick={() => openDeclineModal(booking)}
-            className="upcoming-session-button decline"
-          >
-            <X size={15} />
-            Decline
-          </button>
-        </div>
-      ) : (
-        <div className="upcoming-session-actions">
-
-          {calendarStatusLoading ? (
-            <button
-              className="upcoming-session-button"
-              disabled
-            >
-              Checking...
-            </button>
-          ) : !calendarConnected ? (
-            <button
-              onClick={handleConnectGoogleCalendar}
-              className="upcoming-session-button approve"
-              disabled={calendarConnectLoading}
-            >
-              Connect Calendar
-            </button>
-          ) : (
-            <button
-              onClick={() =>
-                handleAddBookingToCalendar(booking)
-              }
-              className="upcoming-session-button approve"
-            >
-              Add to Calendar
-            </button>
-          )}
-          <button
-            onClick={() => openCompleteModal(booking)}
-            className="upcoming-session-button complete"
-          >
-            <Check size={15} />
-            Complete
-          </button>
-
-          <button
-            onClick={() => openCancelModal(booking)}
-            className="upcoming-session-button cancel"
-          >
-            <X size={15} />
-            Cancel
-          </button>
-        </div>
-      )}
+  const card = booking => <article className="upcoming-session-card" key={booking.bookingId} aria-label={`Assessment booking ${booking.bookingId}`}>
+    <div className="upcoming-session-card-content"><div className="upcoming-session-name-row"><Link to={`/home/supervisor/student-profile?id=${encodeURIComponent(booking.studentId)}`}>{booking.studentName}</Link><span className="upcoming-session-badge">{booking.type}</span></div>
+      <SessionDetails booking={booking} /><p className="supervisor-session-guidance">{booking.actionGuidance}</p></div>
+    <div className="upcoming-session-actions">
+      {booking.bookingStatus === 0 ? <>
+        <button type="button" className="upcoming-session-button approve" disabled={loading || busy || !booking.canApprove} onClick={() => open("APPROVE", booking)}>Approve</button>
+        <button type="button" className="upcoming-session-button decline" disabled={loading || busy || !booking.canDecline} onClick={() => open("DECLINE", booking)}>Decline</button>
+      </> : <>
+        {booking.canCancel && <button type="button" className="upcoming-session-button approve" disabled={calendar === null || Boolean(calendarBusy) || busy} onClick={() => updateCalendar(booking)}>{calendarBusy === booking.bookingId ? "Updating calendar…" : calendar ? "Add to Calendar" : "Connect Calendar"}</button>}
+        <button type="button" className="upcoming-session-button complete" disabled={loading || busy || !booking.canComplete} onClick={() => open("COMPLETE", booking)}>Complete</button>
+        <button type="button" className="upcoming-session-button cancel" disabled={loading || busy || !booking.canCancel} onClick={() => open("CANCEL", booking)}>Cancel</button>
+      </>}
     </div>
-  );
+  </article>;
 
-  return (
-    <div>
-      <main className="upcoming-session-main">
-        <div className="upcoming-session-container">
-          <div className="upcoming-session-header">
-            <h1 className="upcoming-session-title">Upcoming Sessions</h1>
-
-            <p className="upcoming-session-subtitle">
-              {approvedBookings.length} scheduled sessions
-            </p>
-          </div>
-
-          <section className="upcoming-session-section approved">
-            <h2 className="upcoming-session-section-title">
-              Approved Sessions
-            </h2>
-
-            {approvedBookings.length === 0 ? (
-              <p className="upcoming-session-empty">
-                No approved sessions yet.
-              </p>
-            ) : (
-              approvedBookings.map((booking) => (
-                <BookingCard
-                  key={booking.bookingId}
-                  booking={booking}
-                  showActions={false}
-                />
-              ))
-            )}
-          </section>
-
-          <section className="upcoming-session-section pending">
-            <h2 className="upcoming-session-section-title">
-              Request Approval
-            </h2>
-
-            {pendingBookings.length === 0 ? (
-              <p className="upcoming-session-empty">
-                No pending requests.
-              </p>
-            ) : (
-              pendingBookings.map((booking) => (
-                <BookingCard
-                  key={booking.bookingId}
-                  booking={booking}
-                  showActions={true}
-                />
-              ))
-            )}
-          </section>
-        </div>
-      </main>
-
-      <BaseModal
-        isOpen={showDeclineModal && !!selectedBooking}
-        title="Decline Booking"
-        onClose={closeDeclineModal}
-      >
-        {selectedBooking && (
-          <div>
-            <div>
-              <ModalTitle title="Decline Booking" />
-
-              <p className="upcoming-session-modal-description">
-                Are you sure you want to decline{" "}
-                <strong>{selectedBooking.studentName}</strong>'s booking request?
-              </p>
-
-              {AssessmentSlotRepeatTypeEnum.NO_REPEAT.code === selectedBooking.repeatType && (
-                  <div className="upcoming-session-info-box">
-                    <p className="upcoming-session-info-title">
-                      Return this slot to Available Slots?
-                    </p>
-
-                    <label className="upcoming-session-radio-option">
-                      <input
-                          type="radio"
-                          checked={returnSlot === true}
-                          onChange={() => setReturnSlot(true)}
-                          className="upcoming-session-radio-input"
-                      />
-
-                      <div>
-                        <div className="upcoming-session-radio-title">
-                          Return to Available Slots
-                        </div>
-
-                        <div className="upcoming-session-radio-description">
-                          Other students can book this session again.
-                        </div>
-                      </div>
-                    </label>
-
-                    <label className="upcoming-session-radio-option">
-                      <input
-                          type="radio"
-                          checked={returnSlot === false}
-                          onChange={() => setReturnSlot(false)}
-                          className="upcoming-session-radio-input"
-                      />
-
-                      <div>
-                        <div className="upcoming-session-radio-title">
-                          Keep Slot Closed
-                        </div>
-
-                        <div className="upcoming-session-radio-description">
-                          This session will not appear in Available Slots.
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-              )}
-
-              <div className="upcoming-session-modal-actions">
-                <button
-                  onClick={closeDeclineModal}
-                  className="upcoming-session-secondary-button"
-                >
-                  Cancel
-                </button>
-
-                <button
-                  onClick={confirmDecline}
-                  className="upcoming-session-danger-button"
-                >
-                  Confirm Decline
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </BaseModal>
-
-      <BaseModal
-        isOpen={showCompleteModal && !!selectedCancelBooking}
-        title="Complete Booking"
-        onClose={closeComCompleteModal}
-      >
-        {selectedCancelBooking && (
-          <form onSubmit={confirmComplete}>
-            <div className="upcoming-session-complete-form">
-              <label htmlFor="score">Score: </label>
-
-              <input
-                className="upcoming-session-score-input"
-                required
-                type="number"
-                name="score"
-                id="score"
-                max={100}
-                min={0}
-                step={0.01}
-              />
-
-              <label htmlFor="feedback">Feedback: </label>
-
-              <textarea
-                name="feedback"
-                id="feedback"
-                maxLength={255}
-                className="upcoming-session-feedback-input"
-                required
-              />
-            </div>
-
-            <div className="upcoming-session-modal-actions">
-              <button
-                onClick={closeComCompleteModal}
-                className="upcoming-session-secondary-button"
-              >
-                Go Back
-              </button>
-
-              <button
-                type="submit"
-                className="upcoming-session-success-button"
-              >
-                Complete Session
-              </button>
-            </div>
-          </form>
-        )}
-      </BaseModal>
-
-      <BaseModal
-        isOpen={showCancelModal && !!selectedCancelBooking}
-        title="Cancle Booking"
-        onClose={closeCancelModal}
-      >
-        {selectedCancelBooking && (
-          <div>
-            <div>
-              <ModalTitle title="Cancel Approved Session" />
-
-              <p className="upcoming-session-modal-description">
-                This will permanently cancel{" "}
-                <strong>{selectedCancelBooking.studentName}</strong>'s approved
-                session.
-              </p>
-
-              <div className="upcoming-session-info-box">
-                <div className="upcoming-session-info-title">
-                  What happens next?
-                </div>
-
-                <div className="upcoming-session-info-list">
-                  <div>• The approved session will be cancelled.</div>
-                  <div>• The booking will be removed from Upcoming Sessions.</div>
-                  <div className="upcoming-session-warning-text">
-                    • This assessment slot will remain closed and will NOT be
-                    returned to Available Slots.
-                  </div>
-                </div>
-              </div>
-
-              <div className="upcoming-session-modal-actions">
-                <button
-                  onClick={closeCancelModal}
-                  className="upcoming-session-secondary-button"
-                >
-                  Go Back
-                </button>
-
-                <button
-                  onClick={confirmCancel}
-                  className="upcoming-session-danger-button"
-                >
-                  Cancel Session
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </BaseModal>
-    </div>
-  );
-}
-
-function ModalTitle({ title }) {
-  return (
-    <div className="upcoming-session-modal-title-row">
-      <TriangleAlert size={26} color="#DC2626" />
-
-      <h2 className="upcoming-session-modal-title">
-        {title}
-      </h2>
-    </div>
-  );
+  return <main className="upcoming-session-main"><div className="upcoming-session-container">
+    <div className="upcoming-session-header"><h1 className="upcoming-session-title">Upcoming Sessions</h1><p className="upcoming-session-subtitle">{approved.length} confirmed · {pending.length} pending · Australia/Sydney</p>
+      <button type="button" className="upcoming-session-button approve" disabled={loading || busy || Boolean(action)} onClick={refresh}>Refresh sessions</button></div>
+    {loading && <p role="status">Loading sessions…</p>}
+    {loadError && <p role="alert" className="supervisor-session-error">{loadError}</p>}
+    {calendarNotice && <p role="status">{calendarNotice}</p>}
+    {receipt && <div role="status" className="supervisor-session-receipt"><strong>{receipt.label}</strong><p>Reference: {receipt.bookingId}. {receipt.notificationStatus === "LIVE_DELAYED" ? "In-app notifications saved; live alerts delayed." : "In-app notifications saved."} {receipt.status === 2 && <Link to="/home/supervisor/assessment-history">View Assessment History</Link>}</p></div>}
+    <section className="upcoming-session-section pending" aria-label="Requests awaiting approval"><h2 className="upcoming-session-section-title">Request Approval</h2>{pending.map(card)}{!loading && pending.length === 0 && <p className="upcoming-session-empty">No pending requests.</p>}</section>
+    <section className="upcoming-session-section approved" aria-label="Confirmed assessment sessions"><h2 className="upcoming-session-section-title">Approved Sessions</h2>{approved.map(card)}{!loading && approved.length === 0 && <p className="upcoming-session-empty">No confirmed sessions.</p>}</section>
+    <BaseModal isOpen={Boolean(action)} onClose={close} title={actionLabels[action?.kind] || "Review decision"}>
+      {action && <form onSubmit={submit} role="dialog" aria-modal="true" aria-label={actionLabels[action.kind]} className="supervisor-session-review">
+        <h3>{action.booking.studentName} · {action.booking.type}</h3><SessionDetails booking={action.booking} />
+        {action.kind === "COMPLETE" ? <>
+          <p>Record a result only if the assessment took place. Saving changes this booking to Completed and updates the student's progress.</p>
+          <label>Score (0–100)<input type="number" min="0" max="100" step="0.01" required value={score} disabled={busy} onChange={e => setScore(e.target.value)} /></label>
+          <label>Feedback<textarea maxLength={255} required value={feedback} disabled={busy} onChange={e => setFeedback(e.target.value)} /></label>
+        </> : <p>{action.kind === "APPROVE" ? "Approve this request for the actual session shown above. Approval does not complete the assessment." : action.kind === "DECLINE" ? "Decline this Pending request. The record stays in the student's booking history." : "Cancel this confirmed session. The record stays in the student's booking history."}</p>}
+        {["DECLINE", "CANCEL"].includes(action.kind) && action.booking.repeatType === 0 && <fieldset disabled={busy}><legend>Availability after this decision</legend>
+          <label><input type="radio" name="availability" checked={reopen} onChange={() => setReopen(true)} /> Return this session to available slots</label>
+          <label><input type="radio" name="availability" checked={!reopen} onChange={() => setReopen(false)} /> Keep this session closed</label>
+        </fieldset>}
+        {["DECLINE", "CANCEL"].includes(action.kind) && action.booking.repeatType !== 0 && <p>Only this occurrence is affected. Other dates and the publication's enabled setting are preserved.</p>}
+        <label className="supervisor-session-check"><input type="checkbox" checked={checked} disabled={busy} onChange={e => setChecked(e.target.checked)} /> {action.kind === "COMPLETE" ? "I confirm the assessment took place and have checked this result." : "I checked the student, session and decision."}</label>
+        {actionError && <p role="alert" className="supervisor-session-error">{actionError}</p>}
+        <div className="upcoming-session-modal-actions"><button type="button" className="upcoming-session-secondary-button" disabled={busy} onClick={close}>Back</button><button type="submit" className="upcoming-session-success-button" disabled={busy || !checked}>{busy ? "Saving…" : `Confirm ${action.kind.toLowerCase()}`}</button></div>
+      </form>}
+    </BaseModal>
+  </div></main>;
 }

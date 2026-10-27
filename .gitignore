@@ -60,6 +60,8 @@ build/
 
 
 # Local credentials and data exports
+/.local/
+__pycache__/
 .env
 .env.local
 .env.*.local

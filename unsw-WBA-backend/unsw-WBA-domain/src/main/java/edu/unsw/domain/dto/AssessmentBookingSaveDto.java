@@ -2,6 +2,8 @@ package edu.unsw.domain.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -27,5 +29,10 @@ public class AssessmentBookingSaveDto {
     private Long assessmentSlotId;
 
     @Schema(description = "Slot version, used to check if the slot has been updated")
+    @NotNull(message = "Slot version is required; refresh the session")
+    @PositiveOrZero
     private Integer slotVersion;
+
+    @Pattern(regexp = "[A-Za-z0-9_-]{16,64}", message = "Invalid request key")
+    private String requestKey;
 }

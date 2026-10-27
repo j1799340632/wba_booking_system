@@ -67,4 +67,10 @@ public class AssessmentBooking implements Serializable {
     @TableField(fill = FieldFill.INSERT)
     @Version
     private Integer version;
+
+    private String requestKey;
+    private String requestHash;
+    /** A terminal management operation remains replayable after its Redis review expires. */
+    private String managementKey;
+    private Long replacementBookingId;
 }

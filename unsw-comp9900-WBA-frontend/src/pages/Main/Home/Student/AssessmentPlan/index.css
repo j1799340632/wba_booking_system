@@ -1,0 +1,75 @@
+.assessment-plan-page { max-width: 1200px; margin: auto; padding: 28px; color: #172b3a; line-height: 1.6; }
+.assessment-plan-page h1 { font-size: 30px; line-height: 1.3; margin: 3px 0 8px; }
+.assessment-plan-page h2 { font-size: 20px; margin: 0 0 12px; }
+.assessment-plan-page h3 { font-size: 15px; margin: 0; }
+.assessment-plan-page p { margin: 8px 0; }
+.assessment-plan-header, .assessment-plan-card-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.assessment-plan-header { margin-bottom: 22px; }
+.assessment-plan-eyebrow { display: flex; align-items: center; gap: 7px; color: #0b6282; font-size: 12px; font-weight: 600; }
+.assessment-plan-panel, .assessment-plan-summary { padding: 24px; margin: 18px 0; background: #fff; border: 1px solid #dae5ec; border-radius: 14px; }
+.assessment-plan-panel { scroll-margin-top: 80px; }
+.assessment-plan-summary { background: #f2f9fb; }
+.assessment-plan-deadline { padding: 14px 16px; border-radius: 10px; background: #f2f9fb; margin: 14px 0; font-size: 13px; }
+.assessment-plan-deadline.is-urgent { background: #fff6df; color: #73531d; border: 1px solid #ebd9aa; }
+.assessment-plan-follow-up-counts { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; margin: 18px 0; }
+.assessment-plan-follow-up-counts dt { font-size: 12px; color: #5a7180; }
+.assessment-plan-follow-up-counts dd { margin: 2px 0; font-size: 24px; font-weight: 600; }
+.assessment-plan-follow-up-list { display: grid; gap: 12px; margin: 16px 0; }
+.assessment-plan-follow-up { display: flex; justify-content: space-between; align-items: center; gap: 20px; border: 1px solid #dde7ed; border-left: 4px solid #7daebe; border-radius: 10px; padding: 16px; font-size: 13px; overflow-wrap: anywhere; }
+.assessment-plan-follow-up.needs-attention { border-left-color: #c78b30; background: #fffdf8; }
+.assessment-plan-follow-up > div { min-width: 0; }
+.assessment-plan-follow-up a { flex-shrink: 0; }
+.assessment-plan-follow-up small { color: #5a7180; }
+.assessment-plan-page a:focus-visible { outline: 2px solid #0b6282; outline-offset: 3px; }
+#assessment-plan-targets, #assessment-plan-sessions { scroll-margin-top: 80px; }
+.assessment-plan-status, .assessment-plan-type { color: #0b5674; font-size: 12px; font-weight: 600; }
+.assessment-plan-status { background: #dceef3; padding: 5px 10px; border-radius: 18px; }
+.assessment-plan-stats { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; margin: 22px 0; }
+.assessment-plan-stats > div { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.assessment-plan-stats strong { font-size: 27px; }
+.assessment-plan-stats span { color: #576c7d; font-size: 12px; }
+.assessment-plan-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.assessment-plan-page button, .assessment-plan-review button { display: inline-flex; gap: 6px; align-items: center; justify-content: center; border: 1px solid #aac5d3; background: #fff; border-radius: 7px; padding: 9px 13px; font: inherit; font-size: 13px; color: #174e68; cursor: pointer; }
+.assessment-plan-page button:disabled, .assessment-plan-review button:disabled { opacity: .5; cursor: default; }
+.assessment-plan-page button:focus-visible, .assessment-plan-review button:focus-visible { outline: 2px solid #0b6282; outline-offset: 3px; }
+.assessment-plan-page .assessment-plan-primary, .assessment-plan-review .assessment-plan-primary { background: #0b5674; color: white; border-color: #0b5674; }
+.assessment-plan-period { display: flex; flex-wrap: wrap; gap: 18px; margin: 18px 0; }
+.assessment-plan-page label { display: flex; flex-direction: column; gap: 5px; font-size: 13px; font-weight: 600; }
+.assessment-plan-page input, .assessment-plan-page select { min-width: 0; border: 1px solid #b8ccd8; border-radius: 7px; padding: 9px; background: #fff; color: #172b3a; font: inherit; font-weight: 400; }
+.assessment-plan-goal-input { display: grid; grid-template-columns: minmax(160px,2fr) minmax(90px,1fr) 40px; align-items: end; gap: 12px; margin: 14px 0; }
+.assessment-plan-goal-input button { height: 40px; padding: 5px; }
+.assessment-plan-progress-grid, .assessment-plan-session-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(280px,100%),1fr)); gap: 16px; }
+.assessment-plan-goal-card, .assessment-plan-session, .assessment-plan-week { border: 1px solid #dde7ed; border-radius: 10px; padding: 18px; min-width: 0; overflow-wrap: anywhere; }
+.assessment-plan-goal-card progress { width: 100%; height: 10px; accent-color: #167d92; margin: 15px 0 5px; }
+.assessment-plan-goal-card dl { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.assessment-plan-goal-card dt { color: #617385; font-size: 12px; }
+.assessment-plan-goal-card dd { margin: 0; font-size: 23px; font-weight: 600; }
+.assessment-plan-goal-card strong { font-size: 12px; color: #527282; }
+.assessment-plan-hint { color: #5a7180; font-size: 12px; }
+.assessment-plan-notice, .assessment-plan-error, .assessment-plan-warning { padding: 12px 16px; border-radius: 8px; font-size: 13px; overflow-wrap: anywhere; }
+.assessment-plan-notice { background: #edf8f0; border: 1px solid #bcdec7; }
+.assessment-plan-error { background: #fff0ed; color: #993d29; }
+.assessment-plan-warning { background: #fff6df; color: #73531d; }
+.assessment-plan-week-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin: 16px 0; }
+.assessment-plan-week p { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; flex-wrap: wrap; }
+.assessment-plan-week span { color: #5c7281; }
+.assessment-plan-session p { font-size: 13px; color: #5a7180; }
+.assessment-plan-session h3 { margin-top: 8px; }
+.assessment-plan-session button { margin-top: 10px; }
+.assessment-plan-review { color: #172b3a; font-size: 14px; line-height: 1.6; }
+.assessment-plan-review dl { display: grid; grid-template-columns: 95px minmax(0,1fr); gap: 10px; }
+.assessment-plan-review dt { font-weight: 600; }
+.assessment-plan-review dd { margin: 0; overflow-wrap: anywhere; }
+.assessment-plan-check { display: flex; gap: 9px; align-items: baseline; margin: 18px 0; }
+@media(max-width:600px) {
+  .assessment-plan-follow-up-counts { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .assessment-plan-follow-up { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .assessment-plan-page { padding: 16px; }
+  .assessment-plan-panel, .assessment-plan-summary { padding: 16px; }
+  .assessment-plan-stats { grid-template-columns: 1fr; gap: 14px; }
+  .assessment-plan-stats > div { display: grid; grid-template-columns: 24px 90px minmax(0,1fr); align-items: center; }
+  .assessment-plan-stats strong { font-size: 23px; }
+  .assessment-plan-goal-input { grid-template-columns: minmax(0,1fr) 80px 32px; gap: 7px; }
+  .assessment-plan-page input, .assessment-plan-page select { width: 100%; box-sizing: border-box; }
+  .assessment-plan-week-grid { grid-template-columns: 1fr; }
+}

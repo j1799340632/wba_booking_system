@@ -49,6 +49,7 @@ request.interceptors.response.use(
     return response.data
   },
   error => {
+    if (axios.isCancel(error)) return Promise.reject(error);
     let status = 500;
     let errorObj
     let errorMsg = 'Server Error'
@@ -69,7 +70,8 @@ request.interceptors.response.use(
           notify.error(errorMsg ?? 'Server Error')
       }
     } else if (error.request) {
-      notify.error(error.request.statusText);
+      errorMsg = 'Connection interrupted. Retry the same request or check its current status.';
+      notify.error(errorMsg);
     } else {
       notify.error(errorMsg)
     }

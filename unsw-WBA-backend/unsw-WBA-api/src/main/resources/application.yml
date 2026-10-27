@@ -28,6 +28,13 @@ spring:
 wba:
   booking:
     time-zone: Australia/Sydney
+    ai:
+      enabled: ${BOOKING_AI_ENABLED:false}
+      endpoint: ${BOOKING_AI_ENDPOINT:https://api.deepseek.com/chat/completions}
+      model: ${BOOKING_AI_MODEL:deepseek-flash}
+      api-key: ${BOOKING_AI_API_KEY:}
+      timeout-seconds: ${BOOKING_AI_TIMEOUT_SECONDS:20}
+      disable-thinking: ${BOOKING_AI_DISABLE_THINKING:true}
 
 logging:
   level:

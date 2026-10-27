@@ -1,0 +1,41 @@
+{
+  "kind": "synthetic-local-acceptance",
+  "date": "2026-10-26",
+  "scopeNote": "Dedicated synthetic showcase, not production performance or user outcome research. Final run makes one actual provider request; development reruns are additional. Test decisions and observations were removed and a fresh showcase was created afterward.",
+  "completedAt": "2026-10-26T11:19:52.462Z",
+  "scope": "synthetic showcase; actual Edge, one model request, Spring, isolated MySQL/Redis",
+  "checks": [
+    "setup creates three public synthetic accounts, six Sydney-relative sessions, two clearly synthetic historical bookings and personal targets; repeated setup preserves the manifest and all records; no model calls or fake observations are seeded",
+    "occupied identities cannot be adopted when the manifest is absent; changed slot markers block all cleanup, including a change injected after preflight that is caught inside the transaction; another student booking a showcase session blocks cleanup and preserves that booking; guard failures retain the original showcase",
+    "generated query works with one real model request; real student UI shows 1/5 completed, requires explicit confirmation and saves one Pending booking; setup after that write preserves the new booking instead of resetting the demonstration",
+    "mentor approves the newly requested future session while completion stays 1; separately completes the clearly labelled historical confirmed fixture; student sees 2/5 completed and remaining 3, with future confirmation still provisional in different browser time zones",
+    "admin sees the real runtime report; only search/review/confirmation produce three observations and one model call; full cleanup removes only owned records and observations; existing bookings, goals and event IDs survive; new setup leaves a fresh ready showcase with 0 seeded events"
+  ],
+  "pageErrors": [],
+  "providerCalls": 1,
+  "existingDataPreserved": true,
+  "baselineBookingPlanSha256": "cbd5cbc820cd5a017ac75c512b790fd4128bce57b18196039e7f8371f7bfaaf6",
+  "leftFreshShowcase": true,
+  "counts": {
+    "plans": 1,
+    "slots": 6,
+    "users": 3,
+    "events": 0,
+    "bookings": 2,
+    "messages": 0,
+    "settings": 3,
+    "connections": 0,
+    "foreignPlans": 0,
+    "foreignSlots": 0,
+    "foreignUsers": 0,
+    "foreignBookings": 0,
+    "foreignMessages": 0,
+    "foreignSettings": 0,
+    "accountReferences": 0,
+    "hospitalReferences": 0,
+    "wba_typeReferences": 0,
+    "user_roleReferences": 0,
+    "departmentReferences": 0
+  },
+  "githubPushes": 0
+}

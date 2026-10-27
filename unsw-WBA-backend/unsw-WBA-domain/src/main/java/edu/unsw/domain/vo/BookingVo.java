@@ -54,4 +54,10 @@ public class BookingVo {
 
     @Schema(description = "Optimistic lock version")
     private Integer version;
+
+    private boolean replayed;
+    /** SAVED means durable in-app messages; LIVE_DELAYED never means the booking failed. */
+    private String notificationStatus;
+    private boolean canManage;
+    private String managementRestriction;
 }

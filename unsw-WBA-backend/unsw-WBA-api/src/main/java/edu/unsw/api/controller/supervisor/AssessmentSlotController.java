@@ -7,11 +7,13 @@ import edu.unsw.domain.dto.AssessmentSlotQueryDto;
 import edu.unsw.domain.dto.AssessmentSlotSaveDto;
 import edu.unsw.domain.vo.AssessmentSlotVo;
 import edu.unsw.domain.vo.UpcomingSessionVo;
+import edu.unsw.domain.vo.SupervisorBookingResult;
 import edu.unsw.service.AssessmentSlotService;
 import edu.unsw.domain.dto.AssessmentCompletionDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Min;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,30 +73,32 @@ public class AssessmentSlotController {
 
     @PostMapping("/approveSlot")
     @Operation(summary = "approveSlot")
-    public ResultEntity<Void> approveSlot(@NotNull(message = "Slot id required") Long id, @NotNull(message = "Booking id required") Long bookingId) {
-        assessmentSlotService.approveSlot(id, bookingId);
-        return ResultEntity.success("Approve slot successfully");
+    public ResultEntity<SupervisorBookingResult> approveSlot(@NotNull(message = "Slot id required") Long id, @NotNull(message = "Booking id required") Long bookingId, @RequestParam @Min(0) Integer version) {
+        return ResultEntity.success("Approve slot successfully",assessmentSlotService.approveSlot(id, bookingId, version));
     }
 
     @PostMapping("/declineSlot")
     @Operation(summary = "declineSlot")
-    public ResultEntity<Void> declineSlot(@NotNull(message = "Slot id required") Long id, @NotNull(message = "Booking id required") Long bookingId, @NotNull(message = "Expected slot status") Boolean isEnable) {
-        assessmentSlotService.declineSlot(id, bookingId, isEnable);
-        return ResultEntity.success("Decline slot successfully");
+    public ResultEntity<SupervisorBookingResult> declineSlot(@NotNull(message = "Slot id required") Long id, @NotNull(message = "Booking id required") Long bookingId, @NotNull(message = "Expected slot status") Boolean isEnable, @RequestParam @Min(0) Integer version) {
+        return ResultEntity.success("Decline slot successfully",assessmentSlotService.declineSlot(id, bookingId, isEnable, version));
     }
 
     @PostMapping("/cancelSlot")
     @Operation(summary = "cancelSlot")
-    public ResultEntity<Void> cancelSlot(@NotNull(message = "Slot id required") Long id, @NotNull(message = "Booking id required") Long bookingId, @NotNull(message = "Expected slot status") Boolean isEnable) {
-        assessmentSlotService.cancelSlot(id, bookingId, isEnable);
-        return ResultEntity.success("Cancel slot successfully");
+    public ResultEntity<SupervisorBookingResult> cancelSlot(@NotNull(message = "Slot id required") Long id, @NotNull(message = "Booking id required") Long bookingId, @NotNull(message = "Expected slot status") Boolean isEnable, @RequestParam @Min(0) Integer version) {
+        return ResultEntity.success("Cancel slot successfully",assessmentSlotService.cancelSlot(id, bookingId, isEnable, version));
     }
 
     @PostMapping("/markAssessmentCompleted")
     @Operation(summary = "Mark assessment completed")
-    public ResultEntity<Void> markAssessmentCompleted(
+    public ResultEntity<SupervisorBookingResult> markAssessmentCompleted(
             @Validated @RequestBody AssessmentCompletionDto assessmentCompletionDto) {
-        assessmentSlotService.markAssessmentCompleted(assessmentCompletionDto);
-        return ResultEntity.success("Mark assessment completed successfully");
+        return ResultEntity.success("Mark assessment completed successfully",assessmentSlotService.markAssessmentCompleted(assessmentCompletionDto));
+    }
+
+    @PostMapping("/updateAssessmentResult")
+    @Operation(summary = "Correct a completed assessment result without changing its completion date")
+    public ResultEntity<SupervisorBookingResult> updateAssessmentResult(@Validated @RequestBody AssessmentCompletionDto request) {
+        return ResultEntity.success("Assessment result updated",assessmentSlotService.updateAssessmentResult(request));
     }
 }

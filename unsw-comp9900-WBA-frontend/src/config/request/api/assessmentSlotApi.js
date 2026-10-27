@@ -25,25 +25,27 @@ export const toggleAssessmentSlotsEnableDisable =
     request.post("/supervisor/assessmentSlot/toggleAssessmentSlotsEnableDisable", null, {params: {ids, isEnable}});
 
 export const getApprovedSession =
-    (pageNum, pageQuantity) =>
-        request.get("/supervisor/assessmentSlot/getApprovedSession", {params: {pageNum, pageQuantity}});
+    (pageNum, pageQuantity, signal) =>
+        request.get("/supervisor/assessmentSlot/getApprovedSession", {params: {pageNum, pageQuantity}, signal});
 
 export const getUpcomingSession =
-    (pageNum, pageQuantity) =>
-        request.get("/supervisor/assessmentSlot/getUpcomingSession", {params: {pageNum, pageQuantity}});
+    (pageNum, pageQuantity, signal) =>
+        request.get("/supervisor/assessmentSlot/getUpcomingSession", {params: {pageNum, pageQuantity}, signal});
 
 export const approveSlot =
-    (id, bookingId) =>
-        request.post("/supervisor/assessmentSlot/approveSlot", null, {params: {id, bookingId}});
+    (id, bookingId, version) =>
+        request.post("/supervisor/assessmentSlot/approveSlot", null, {params: {id, bookingId, version}});
 
 export const completeSlot =
     (bookingInfo) =>
         request.post("/supervisor/assessmentSlot/markAssessmentCompleted", bookingInfo);
 
+export const updateAssessmentResult = bookingInfo => request.post("/supervisor/assessmentSlot/updateAssessmentResult", bookingInfo);
+
 export const declineSlot =
-    (id, bookingId, isEnable) =>
-        request.post("/supervisor/assessmentSlot/declineSlot", null, {params: {id, bookingId, isEnable}});
+    (id, bookingId, isEnable, version) =>
+        request.post("/supervisor/assessmentSlot/declineSlot", null, {params: {id, bookingId, isEnable, version}});
 
 export const cancelSlot =
-    (id, bookingId, isEnable) =>
-        request.post("/supervisor/assessmentSlot/cancelSlot", null, {params: {id, bookingId, isEnable}});
+    (id, bookingId, isEnable, version) =>
+        request.post("/supervisor/assessmentSlot/cancelSlot", null, {params: {id, bookingId, isEnable, version}});

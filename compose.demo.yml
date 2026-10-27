@@ -1,0 +1,40 @@
+# Local integration only. This is a separate project from docker-compose.yml.
+name: wba-ai-demo
+services:
+  mysql:
+    image: mysql:latest
+    restart: "no"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${WBA_DEMO_MYSQL_ROOT_PASSWORD:?Run scripts/local_demo.py start}
+      MYSQL_DATABASE: unsw_wba
+      MYSQL_USER: wba_demo
+      MYSQL_PASSWORD: ${WBA_DEMO_MYSQL_PASSWORD:?Run scripts/local_demo.py start}
+    ports:
+      - "127.0.0.1:13306:3306"
+    volumes:
+      - mysql_demo_data:/var/lib/mysql
+      - ./mysql-init.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./scripts/demo/seed.sql:/docker-entrypoint-initdb.d/02-demo.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", 'MYSQL_PWD="$$MYSQL_PASSWORD" mysql -u wba_demo unsw_wba -e "SELECT COUNT(*) FROM demo_metadata" >/dev/null 2>&1']
+      interval: 3s
+      timeout: 5s
+      retries: 40
+  redis:
+    image: redis:latest
+    restart: "no"
+    environment:
+      REDIS_PASSWORD: ${WBA_DEMO_REDIS_PASSWORD:?Run scripts/local_demo.py start}
+    command: ["sh", "-c", 'exec redis-server --requirepass "$$REDIS_PASSWORD" --appendonly yes']
+    ports:
+      - "127.0.0.1:16379:6379"
+    volumes:
+      - redis_demo_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", 'REDISCLI_AUTH="$$REDIS_PASSWORD" redis-cli ping | grep -q PONG']
+      interval: 3s
+      timeout: 3s
+      retries: 20
+volumes:
+  mysql_demo_data:
+  redis_demo_data:

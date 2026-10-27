@@ -433,3 +433,5 @@
     width: 100%;
   }
 }
+.my-bookings-focused-card { outline: 2px solid #0b6282; outline-offset: 3px; scroll-margin: 24px; }
+.my-bookings-focus-reference { color: #0b5674; font-size: 12px; overflow-wrap: anywhere; }

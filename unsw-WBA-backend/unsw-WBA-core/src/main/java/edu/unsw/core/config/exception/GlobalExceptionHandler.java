@@ -10,6 +10,8 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.dao.ConcurrencyFailureException;
+import org.springframework.dao.DataAccessException;
 
 /**
  * @author 徐一杰
@@ -19,6 +21,19 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(ConcurrencyFailureException.class)
+    public ResultEntity<Object> concurrentBooking(ConcurrencyFailureException error) {
+        return ResultEntity.failure(ResponseEnum.SLOT_CONFLICT.getCode(),
+                "The session is busy or changed. Retry the same confirmation or refresh the search.");
+    }
+
+    @ExceptionHandler(DataAccessException.class)
+    public ResultEntity<Object> unavailableDatabase(DataAccessException error) {
+        logger.error("Database request unavailable: {}", error.getClass().getSimpleName());
+        return ResultEntity.failure(ResponseEnum.DATA_SAVE_FAILED.getCode(),
+                "The database is temporarily unavailable. Retry the same request or check My Bookings.");
+    }
 
     /**
      * Handling custom business exceptions

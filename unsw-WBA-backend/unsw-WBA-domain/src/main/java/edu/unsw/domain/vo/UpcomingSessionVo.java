@@ -21,4 +21,13 @@ public class UpcomingSessionVo extends AssessmentSlotVo {
 
     @Schema(description = "Student name")
     private String studentName;
+
+    private Integer bookingVersion;
+    private Integer bookingStatus;
+    private String timeZone;
+    private boolean canApprove;
+    private boolean canDecline;
+    private boolean canCancel;
+    private boolean canComplete;
+    private String actionGuidance;
 }

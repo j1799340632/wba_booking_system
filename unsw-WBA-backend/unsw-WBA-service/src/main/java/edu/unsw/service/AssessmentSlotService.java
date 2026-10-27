@@ -7,6 +7,7 @@ import edu.unsw.domain.dto.AssessmentSlotSaveDto;
 import edu.unsw.domain.entity.AssessmentSlot;
 import edu.unsw.domain.vo.AssessmentSlotVo;
 import edu.unsw.domain.vo.UpcomingSessionVo;
+import edu.unsw.domain.vo.SupervisorBookingResult;
 import edu.unsw.domain.dto.AssessmentCompletionDto;
 
 import java.util.List;
@@ -65,7 +66,7 @@ public interface AssessmentSlotService extends IService<AssessmentSlot> {
      * @param id assessment slot id
      * @param bookingId booking id
      */
-    void approveSlot(Long id, Long bookingId);
+    SupervisorBookingResult approveSlot(Long id, Long bookingId, Integer version);
 
     /**
      * Decline an assessment slot
@@ -73,7 +74,7 @@ public interface AssessmentSlotService extends IService<AssessmentSlot> {
      * @param bookingId booking id
      * @param isEnable expected slot status
      */
-    void declineSlot(Long id, Long bookingId, Boolean isEnable);
+    SupervisorBookingResult declineSlot(Long id, Long bookingId, Boolean isEnable, Integer version);
 
     /**
      * Cancel an assessment slot
@@ -81,12 +82,14 @@ public interface AssessmentSlotService extends IService<AssessmentSlot> {
      * @param bookingId booking id
      * @param isEnable expected slot status
      */
-    void cancelSlot(Long id, Long bookingId, Boolean isEnable);
+    SupervisorBookingResult cancelSlot(Long id, Long bookingId, Boolean isEnable, Integer version);
 
     /**
      * Mark an approved assessment as completed
      *
      * @param assessmentCompletionDto completion data
      */
-    void markAssessmentCompleted(AssessmentCompletionDto assessmentCompletionDto);
+    SupervisorBookingResult markAssessmentCompleted(AssessmentCompletionDto assessmentCompletionDto);
+
+    SupervisorBookingResult updateAssessmentResult(AssessmentCompletionDto assessmentCompletionDto);
 }

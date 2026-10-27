@@ -1,5 +1,6 @@
 import "./index.css";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import {CalendarDays, CalendarPlus, Clock, MapPin, XCircle,} from "lucide-react";
 import {cancelBooking, getMyBookings,} from "@/config/request/api/assessmentBookingApi.js";
 import {
@@ -9,13 +10,23 @@ import {
 } from "@/config/request/api/googleCalendarApi.js";
 import BaseModal from "@/components/BaseModal/index.jsx";
 import {notify} from "@/utils/notify.js";
-import {sendNotification} from "@/config/request/api/sendNotificationApi.js";
-import {notificationEvent} from "@/utils/sse/sseEventChannel.js";
 import {Loading} from "@/components/Loading/index.jsx";
 
 export default function MyBookingsStudent() {
   const [bookings, setBookings] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
+  const [bookingsLoaded, setBookingsLoaded] = useState(false);
+  const [searchParams] = useSearchParams();
+  const requestedBooking = searchParams.get("booking") || "";
+  const focusedBooking = /^\d+$/.test(requestedBooking) ? requestedBooking : "";
+  const focusedCard = useRef(null);
+
+  useEffect(() => {
+    if (focusedCard.current) {
+      focusedCard.current.scrollIntoView({ block: "center" });
+      focusedCard.current.focus({ preventScroll: true });
+    }
+  }, [bookings, focusedBooking]);
 
   const [showCancelModal, setShowCancelModal] = useState(false);
 
@@ -48,6 +59,7 @@ export default function MyBookingsStudent() {
     getMyBookings(1, -1)
       .then((data) => {
         setBookings(data.data.records);
+        setBookingsLoaded(true);
       })
       .catch((err) => {
         setErrorMessage(
@@ -168,39 +180,7 @@ export default function MyBookingsStudent() {
   };
 
   const canCancelBooking = (booking) => {
-    if (booking.status === 0) {
-      return true;
-    }
-
-    // Only confirmed bookings use the 48-hour restriction.
-    if (
-      booking.status !== 1 ||
-      !booking.startTime
-    ) {
-      return false;
-    }
-
-    const startTimeFormat =
-      booking.startTime.replace(" ", "T");
-
-    const startTimeStamp = new Date(
-      startTimeFormat
-    ).getTime();
-
-    const localTime = new Date().getTime();
-
-    const diffInMs =
-      startTimeStamp - localTime;
-
-    if (diffInMs < 0) {
-      return false;
-    }
-
-    const diffInMinutes = Math.floor(
-      diffInMs / (1000 * 60)
-    );
-
-    return diffInMinutes > 48 * 60;
+    return booking.canManage === true;
   };
 
   const handleConnectGoogleCalendar = () => {
@@ -277,30 +257,11 @@ export default function MyBookingsStudent() {
       selectedCancelBooking.bookingId ||
       selectedCancelBooking.id;
 
-    const supervisorId =
-      selectedCancelBooking.supervisorId;
-
-    const sessionType =
-      selectedCancelBooking.type ||
-      selectedCancelBooking.wbaType ||
-      "assessment";
-
-    const sessionDate = formatDate(
-      selectedCancelBooking.startTime
-    );
-
-    const sessionTime = formatTime(
-      selectedCancelBooking.startTime
-    );
-
     cancelBooking(cancelId)
       .then(() => {
         setBookings((previousBookings) =>
-          previousBookings.filter(
-            (booking) =>
-              (booking.bookingId || booking.id) !==
-              cancelId
-          )
+          previousBookings.map(booking => (booking.bookingId || booking.id) === cancelId
+            ? { ...booking, status: 4, canManage: false } : booking)
         );
 
         setAddedCalendarBookingIds((previousIds) =>
@@ -312,19 +273,6 @@ export default function MyBookingsStudent() {
         notify.success(
           "Booking cancelled successfully"
         );
-
-        if (supervisorId) {
-          sendNotification({
-            receiverId: supervisorId,
-            eventName: notificationEvent,
-            eventContent:
-              `The booking for the ${sessionType} session on ` +
-              `${sessionDate} at ${sessionTime} has been cancelled.`,
-            isSendEmail: true,
-          }).catch((err) => {
-            console.log(err);
-          });
-        }
 
         closeCancelModal();
       })
@@ -347,8 +295,7 @@ export default function MyBookingsStudent() {
           </h1>
 
           <p className="my-bookings-subtitle">
-            All scheduled and pending assessment
-            sessions
+            Your assessment bookings and cancelled requests
           </p>
 
           {errorMessage && (
@@ -356,6 +303,8 @@ export default function MyBookingsStudent() {
               {errorMessage}
             </div>
           )}
+
+          {focusedBooking && bookingsLoaded && !errorMessage && !bookings.some(booking => String(booking.bookingId || booking.id) === focusedBooking) && <p className="my-bookings-error-box" role="status">This booking is no longer in your available records. <Link to="/home/student/assessment-plan">Refresh your assessment plan</Link> to check its latest status.</p>}
 
           <div className="my-bookings-list">
             {bookings.map((booking) => {
@@ -373,9 +322,13 @@ export default function MyBookingsStudent() {
               return (
                 <div
                   key={bookingId}
-                  className="my-bookings-card"
+                  className={`my-bookings-card${String(bookingId) === focusedBooking ? " my-bookings-focused-card" : ""}`}
+                  ref={String(bookingId) === focusedBooking ? focusedCard : null}
+                  tabIndex={String(bookingId) === focusedBooking ? -1 : undefined}
+                  aria-current={String(bookingId) === focusedBooking ? "true" : undefined}
                 >
                   <div className="my-bookings-card-content">
+                    {String(bookingId) === focusedBooking && <p className="my-bookings-focus-reference">Opened from your assessment plan · Reference: {bookingId}</p>}
                     <div className="my-bookings-top-line">
                       <h3 className="my-bookings-name">
                         {booking.supervisorName ||
@@ -433,6 +386,8 @@ export default function MyBookingsStudent() {
                     >
                       {getStatus(booking.status)}
                     </span>
+
+                    {booking.status === 1 && booking.managementRestriction && <small>{booking.managementRestriction}</small>}
 
                     {booking.status === 1 && (
                       <>
